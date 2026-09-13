@@ -6,881 +6,525 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Health Office">
-<meta name="theme-color" content="#0E7C7B">
-<title>Health Office — K‑12 Student Check‑in 校護站</title>
+<title>Health Office — Student Check-in 校護站</title>
 <style>
 :root{
-  --ink:#11303B; --ink2:#4C6C77; --ink3:#8AA3A5;
-  --paper:#EDF3F1; --paper2:#E2EBE8; --surface:#FFFFFF;
-  --line:#D2E0DC; --line2:#E8F0ED;
-  --teal:#0E7C7B; --teal-d:#0A5E5D; --teal-l:#DBEDEC;
-  --amber:#A8690F; --amber-l:#FBF1DC;
-  --alert:#AE2F24; --alert-l:#FBE5E2;
-  --plum:#6B4A7A; --plum-l:#F1E9F4;
-  --r:18px;
+  --ink:#12303C;
+  --ink-2:#4A6975;
+  --paper:#EEF3F1;
+  --surface:#FFFFFF;
+  --line:#D3E0DC;
+  --teal:#0E7C7B;
+  --teal-dim:#DCEDEC;
+  --amber:#B57314;
+  --amber-dim:#FBF0DB;
+  --alert:#B33327;
+  --alert-dim:#FBE6E3;
+  --shadow:0 1px 0 rgba(18,48,60,.08);
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-input,textarea{-webkit-user-select:text;user-select:text}
-html,body{margin:0;padding:0;height:100%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
 body{
-  background:linear-gradient(180deg,#F4F8F6 0%,var(--paper) 40%,var(--paper2) 100%);
-  background-attachment:fixed;
+  background:var(--paper);
   color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei","Helvetica Neue",sans-serif;
-  font-size:18px;line-height:1.5;-webkit-font-smoothing:antialiased;
-  padding-bottom:60px;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",'Helvetica Neue',sans-serif;
+  font-size:18px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:40px;
 }
-button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;border:none;background:none}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
-/* ============ top bar ============ */
+/* ---------- top bar ---------- */
 .bar{
-  position:sticky;top:0;z-index:60;
-  background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(12px);
-  border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:10px;
-  padding:9px 16px;padding-top:max(9px,env(safe-area-inset-top));
+  position:sticky;top:0;z-index:50;
+  background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));
 }
-.brand{display:flex;align-items:center;gap:10px;white-space:nowrap}
-.brand .mark{
-  width:36px;height:36px;border-radius:11px;flex:none;
-  background:linear-gradient(145deg,var(--teal),#12A09B);
-  color:#fff;display:grid;place-items:center;font-size:19px;
-  box-shadow:0 2px 6px rgba(14,124,123,.3);
-}
-.brand b{display:block;font-size:16px;letter-spacing:-.01em;line-height:1.15}
-.brand small{display:block;font-size:11.5px;color:var(--ink2);font-weight:500}
+.brand{font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.brand small{display:block;font-weight:500;font-size:12px;color:var(--ink-2);letter-spacing:.02em}
 .who{flex:1;display:flex;gap:8px;min-width:0}
 .who input{
-  flex:1;min-width:0;font:inherit;font-size:15px;padding:9px 12px;
-  border:1px solid var(--line);border-radius:10px;background:#F8FBFA;color:var(--ink);
+  flex:1;min-width:0;font:inherit;font-size:16px;padding:9px 12px;
+  border:1px solid var(--line);border-radius:8px;background:#FBFDFC;color:var(--ink);
 }
-.who input::placeholder{color:#A2B6B4}
-.tb{border:1px solid var(--line);background:var(--surface);padding:9px 12px;border-radius:10px;font-size:14.5px;font-weight:600;white-space:nowrap}
-.tb.on{background:var(--teal-l);border-color:#9FCFCD;color:var(--teal-d)}
-.tb.alarm{background:var(--alert);border-color:var(--alert);color:#fff;letter-spacing:.02em}
-.agepill{border:1px solid var(--line);background:#F8FBFA;padding:9px 12px;border-radius:10px;font-size:14.5px;font-weight:600;color:var(--ink2)}
-
-.wrap{max-width:1120px;margin:0 auto;padding:22px 18px 0}
-
-/* ============ headings ============ */
-.h1{margin:6px 0 4px;font-size:34px;font-weight:700;letter-spacing:-.025em;line-height:1.15}
-.h1.kid{font-size:42px}
-.sub{margin:0 0 20px;font-size:18px;color:var(--ink2)}
-.hint{font-size:14.5px;color:var(--ink2)}
-.sec{font-size:13px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin:0 0 12px}
-
-/* ============ tiles ============ */
-.grid{display:grid;gap:13px;grid-template-columns:repeat(auto-fill,minmax(238px,1fr))}
-.grid.k{grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
-.grid.w{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
-.tile{
-  display:flex;align-items:center;gap:14px;text-align:left;width:100%;
-  background:var(--surface);border:1.5px solid var(--line2);border-radius:var(--r);
-  padding:16px;min-height:92px;
-  box-shadow:0 1px 2px rgba(17,48,59,.05),0 6px 14px -10px rgba(17,48,59,.22);
-  transition:transform .1s ease,border-color .12s,box-shadow .12s;
+.who input::placeholder{color:#9DB2B0}
+.barbtn{
+  border:1px solid var(--line);background:var(--surface);
+  padding:9px 13px;border-radius:8px;font-size:15px;font-weight:600;white-space:nowrap;
 }
-.tile:active{transform:scale(.98);border-color:var(--teal)}
-.grid.k .tile{min-height:116px;padding:20px}
-.disc{
-  width:52px;height:52px;border-radius:15px;flex:none;display:grid;place-items:center;font-size:27px;
+.barbtn.alarm{background:var(--alert);border-color:var(--alert);color:#fff}
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 0}
+
+/* ---------- headings ---------- */
+.ask{margin:10px 0 4px;font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.ask-zh{margin:0 0 18px;font-size:19px;color:var(--ink-2)}
+.hint{font-size:15px;color:var(--ink-2);margin:0 0 14px}
+
+/* ---------- trail ---------- */
+.trail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;min-height:0}
+.chip{
+  background:var(--teal-dim);border:1px solid #BFDCDA;color:#0B5D5C;
+  padding:6px 11px;border-radius:999px;font-size:14px;font-weight:600;
 }
-.grid.k .disc{width:64px;height:64px;font-size:34px;border-radius:19px}
-.tile .tx{min-width:0;flex:1}
-.tile .en{display:block;font-size:20px;font-weight:650;letter-spacing:-.012em;line-height:1.25}
-.grid.k .tile .en{font-size:24px}
-.tile .zh{display:block;font-size:14.5px;color:var(--ink2);margin-top:3px}
-.grid.k .tile .zh{font-size:16px}
+.chip b{font-weight:600;color:#0B5D5C;opacity:.65;margin-left:6px;font-size:13px}
 
-/* option buttons */
-.opt{
-  display:flex;align-items:center;gap:12px;text-align:left;width:100%;
-  background:var(--surface);border:1.5px solid var(--line2);border-radius:14px;
-  padding:17px 16px;min-height:80px;
-  box-shadow:0 1px 2px rgba(17,48,59,.05);
-  transition:transform .1s ease,border-color .12s,background .12s;
+/* ---------- big choice grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.pick{
+  display:flex;align-items:center;gap:14px;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:18px 16px;min-height:84px;box-shadow:var(--shadow);
+  transition:border-color .12s,background .12s;
 }
-.opt:active{transform:scale(.985)}
-.opt.on{border-color:var(--teal);border-width:2.5px;background:var(--teal-l);padding:16px 15px}
-.opt .en{display:block;font-size:21px;font-weight:600;letter-spacing:-.012em;line-height:1.3}
-.opt .zh{display:block;font-size:14.5px;color:var(--ink2);margin-top:3px}
-.opt .face{font-size:34px;flex:none}
-.opt .tick{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:16px;opacity:0;flex:none}
-.opt.on .tick{opacity:1}
-.spk{
-  margin-left:auto;flex:none;width:46px;height:46px;border-radius:50%;
-  background:#F1F6F5;border:1px solid var(--line);display:grid;place-items:center;font-size:19px;
+.pick:active{background:var(--teal-dim);border-color:var(--teal)}
+.pick.on{border-color:var(--teal);border-width:2px;background:var(--teal-dim);padding:17px 15px}
+.pick .ico{font-size:32px;line-height:1;flex:none}
+.pick .tx{min-width:0}
+.pick .en{display:block;font-size:21px;font-weight:600;letter-spacing:-.01em}
+.pick .zh{display:block;font-size:15px;color:var(--ink-2);margin-top:2px}
+.pick .tick{margin-left:auto;font-size:22px;color:var(--teal);opacity:0}
+.pick.on .tick{opacity:1}
+
+/* ---------- footer nav ---------- */
+.nav{display:flex;gap:12px;margin:22px 0 10px;align-items:center;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--line);background:var(--surface);
+  padding:15px 22px;border-radius:10px;font-size:18px;font-weight:600;
 }
-.spk:active{background:var(--teal-l)}
+.btn.go{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.go:disabled{opacity:.35}
+.spacer{flex:1}
 
-/* ============ trail ============ */
-.trail{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
-.chip{background:var(--teal-l);border:1px solid #B6D8D6;color:var(--teal-d);padding:6px 12px;border-radius:999px;font-size:13.5px;font-weight:600}
-.chip b{font-weight:500;opacity:.7;margin-left:6px}
-.bars{display:flex;gap:5px;margin:0 0 14px}
-.bars i{height:5px;border-radius:3px;background:#D5E4E1;flex:1}
-.bars i.done{background:var(--teal)}
-
-/* ============ nav ============ */
-.nav{display:flex;gap:12px;margin:24px 0 8px;align-items:center;flex-wrap:wrap}
-.btn{border:1.5px solid var(--line);background:var(--surface);padding:15px 22px;border-radius:12px;font-size:17px;font-weight:600}
-.btn.go{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 4px 12px -4px rgba(14,124,123,.5)}
-.btn.go:disabled{opacity:.3;box-shadow:none}
-.btn.warn{background:var(--alert);border-color:var(--alert);color:#fff}
-.sp{flex:1}
-
-/* ============ cards ============ */
+/* ---------- result ---------- */
 .cols{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}
-@media (max-width:900px){.cols{grid-template-columns:1fr}}
-.card{background:var(--surface);border:1px solid var(--line2);border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(17,48,59,.05),0 8px 20px -16px rgba(17,48,59,.3)}
-.card+.card{margin-top:14px}
-.card h3{margin:0 0 14px;font-size:13px;font-weight:700;color:var(--ink2);letter-spacing:.06em}
-.sum{font-size:23px;line-height:1.5;font-weight:650;letter-spacing:-.015em}
-.sum .q{display:block;font-size:16px;font-weight:500;color:var(--ink2);margin-top:9px;line-height:1.6}
-ol.steps{margin:0;padding-left:21px}
-ol.steps li{margin-bottom:11px;font-size:17px;line-height:1.6}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 18px 20px;box-shadow:var(--shadow)}
+.card + .card{margin-top:14px}
+.card h3{margin:0 0 12px;font-size:15px;font-weight:700;color:var(--ink-2);letter-spacing:.04em}
+.sum{font-size:22px;line-height:1.55;font-weight:600}
+.sum .q{color:var(--ink-2);font-weight:500;font-size:16px;display:block;margin-top:8px}
+ol.steps{margin:0;padding-left:22px}
+ol.steps li{margin-bottom:11px;font-size:17.5px;line-height:1.55}
 ol.steps li:last-child{margin-bottom:0}
-ol.steps li.add{background:var(--teal-l);border-radius:8px;padding:8px 10px;margin-left:-6px;font-weight:600}
-.flag{background:var(--alert-l);border:1px solid #EEC4BE;border-left:5px solid var(--alert);border-radius:12px;padding:15px 17px}
-.flag h4{margin:0 0 9px;color:var(--alert);font-size:17px}
-.flag ul{margin:0;padding-left:19px}
-.flag li{margin-bottom:7px;font-size:16.5px;line-height:1.5}
-.dispo{background:var(--amber-l);border:1px solid #EDD9AE;border-radius:12px;padding:14px 16px;font-size:16.5px;margin-top:15px;line-height:1.6}
+.flagbox{background:var(--alert-dim);border:1px solid #EEBFB9;border-left:5px solid var(--alert);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.flagbox h4{margin:0 0 8px;color:var(--alert);font-size:17px}
+.flagbox ul{margin:0;padding-left:20px}
+.flagbox li{margin-bottom:6px;font-size:17px}
+.dispo{background:var(--amber-dim);border:1px solid #EBD6A8;border-radius:10px;padding:13px 15px;font-size:17px;margin-top:14px}
 .dispo b{color:var(--amber)}
-.say{background:#F6FBFA;border:1.5px dashed #B7D7D4;border-radius:13px;padding:14px 16px;margin-bottom:11px;display:flex;align-items:center;gap:12px}
-.say .t{flex:1;min-width:0}
-.say .e{font-size:22px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
-.say .c{font-size:15px;color:var(--ink2);margin-top:5px}
-.vitals{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px}
-.vitals label{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:4px;font-weight:600}
-.vitals input,.card textarea,.card select{width:100%;font:inherit;font-size:16.5px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#F8FBFA;color:var(--ink)}
-.card textarea{min-height:78px;resize:vertical}
-.stack{display:flex;flex-direction:column;gap:10px}
-.timer{display:flex;align-items:center;gap:11px;margin-top:13px;flex-wrap:wrap}
-.clock{font-size:31px;font-weight:700;font-variant-numeric:tabular-nums;min-width:96px;letter-spacing:-.02em}
-.sm{border:1px solid var(--line);background:#F8FBFA;padding:9px 14px;border-radius:9px;font-size:14.5px;font-weight:600}
-.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.tab{border:1.5px solid var(--line);background:var(--surface);padding:11px 17px;border-radius:11px;font-size:16px;font-weight:600}
-.tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.say{background:#F7FBFA;border:1px dashed #B9D5D2;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.say .e{font-size:23px;font-weight:600;line-height:1.35}
+.say .c{font-size:15px;color:var(--ink-2);margin-top:5px}
+.note-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.note-grid label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:4px}
+.note-grid input,.card textarea{
+  width:100%;font:inherit;font-size:17px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:8px;background:#FBFDFC;color:var(--ink);
+}
+.card textarea{min-height:76px;resize:vertical}
+.timer{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.timer .clock{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;min-width:90px}
+.small{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:8px;font-size:15px;font-weight:600}
 
-/* ============ log ============ */
-table.log{width:100%;border-collapse:collapse;font-size:14.5px}
-table.log th{text-align:left;font-size:12.5px;color:var(--ink2);border-bottom:1px solid var(--line);padding:9px 8px;letter-spacing:.03em}
-table.log td{border-bottom:1px solid var(--line2);padding:11px 8px;vertical-align:top}
-.empty{padding:48px 12px;text-align:center;color:var(--ink2)}
+/* ---------- log ---------- */
+table.log{width:100%;border-collapse:collapse;font-size:15px}
+table.log th{text-align:left;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--line);padding:8px 8px}
+table.log td{border-bottom:1px solid #E8EFED;padding:10px 8px;vertical-align:top}
+table.log tr:last-child td{border-bottom:none}
+.empty{padding:40px 10px;text-align:center;color:var(--ink-2)}
 
-/* ============ emergency ============ */
-.sos{background:linear-gradient(180deg,#FDEEEC,var(--alert-l));border:2.5px solid var(--alert);border-radius:18px;padding:24px}
-.sos h2{margin:0 0 8px;color:var(--alert);font-size:29px;letter-spacing:-.02em}
-.sos ol li{font-size:17.5px;margin-bottom:11px;line-height:1.55}
-
-/* ============ printable pass ============ */
-#passArea{display:none}
-.pass{border:2px solid #333;border-radius:10px;padding:16px 20px;width:100%;max-width:520px;margin-bottom:14px}
-.pass h4{margin:0 0 4px;font-size:20px}
-.pass .row{display:flex;gap:10px;font-size:15px;padding:5px 0;border-bottom:1px dotted #bbb}
-.pass .row span:first-child{width:110px;color:#555;flex:none}
+/* ---------- emergency ---------- */
+.sos{background:var(--alert-dim);border:2px solid var(--alert);border-radius:12px;padding:20px}
+.sos h2{margin:0 0 6px;color:var(--alert);font-size:26px}
+.sos ol li{font-size:18px;margin-bottom:10px}
 
 @media print{
-  .bar,.nav,.noprint,.tabs{display:none!important}
-  body{background:#fff;font-size:11.5pt;padding:0}
-  .wrap{padding:0;max-width:100%}
-  .card{border:1px solid #999;box-shadow:none;break-inside:avoid;border-radius:6px}
+  .bar,.nav,.noprint{display:none!important}
+  body{background:#fff;font-size:12pt}
+  .card{border:1px solid #999;box-shadow:none;break-inside:avoid}
   .cols{grid-template-columns:1fr}
-  #passArea{display:block!important}
-  #passArea.only ~ *{display:none}
 }
 </style>
 </head>
 <body>
 
 <div class="bar">
-  <div class="brand">
-    <span class="mark">✚</span>
-    <span><b>Health Office</b><small>保健室 · 學生自助板</small></span>
-  </div>
+  <div class="brand">Health Office<small>保健室 · 學生自助選擇板</small></div>
   <div class="who noprint">
     <input id="sName" placeholder="Student name 姓名" autocomplete="off">
-    <input id="sGrade" placeholder="Grade 年級" autocomplete="off" style="max-width:120px">
+    <input id="sGrade" placeholder="Grade / Class 年級班級" autocomplete="off" style="max-width:170px">
   </div>
-  <button class="agepill noprint" id="ageBtn" onclick="go('age')">年齡層</button>
-  <button class="tb noprint on" id="ttsBtn" onclick="toggleTTS()">🔊 朗讀</button>
-  <button class="tb noprint" onclick="go('phrases')">英文速查</button>
-  <button class="tb noprint" onclick="go('log')">紀錄</button>
-  <button class="tb alarm noprint" onclick="go('sos')">EMERGENCY</button>
+  <button class="barbtn noprint" onclick="go('phrases')">英文速查</button>
+  <button class="barbtn noprint" onclick="go('log')">紀錄</button>
+  <button class="barbtn alarm noprint" onclick="go('sos')">EMERGENCY</button>
 </div>
 
 <div class="wrap" id="app"></div>
-<div id="passArea"></div>
 
 <script>
-/* =======================================================================
-   語音（iOS Safari：首次必須在使用者手勢中觸發，否則靜音）
-   ======================================================================= */
-const TTS = {on:true, unlocked:false, voices:[]};
-function loadVoices(){ try{ TTS.voices = speechSynthesis.getVoices()||[]; }catch(e){} }
-if('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
-function unlockTTS(){
-  if(TTS.unlocked || !('speechSynthesis' in window)) return;
-  try{ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); TTS.unlocked = true; loadVoices(); }catch(e){}
-}
-document.addEventListener('touchstart', unlockTTS, {once:true});
-document.addEventListener('mousedown', unlockTTS, {once:true});
+/* =========================================================
+   資料結構
+   cat: { id, en, zh, ico, q[], plan[], dispo, say[] }
+   q  : { en, zh, multi, o[] }
+   o  : { en, zh, flag?, act?[] }   flag → 紅旗；act → 追加處置
+   ========================================================= */
 
-function pickVoice(lang){
-  const v = TTS.voices.filter(x=>x.lang && x.lang.toLowerCase().startsWith(lang.slice(0,2).toLowerCase()));
-  if(!v.length) return null;
-  return v.find(x=>x.lang.replace('_','-').toLowerCase()===lang.toLowerCase())
-      || v.find(x=>/samantha|karen|moira|aaron|mei-jia|meijia|siri/i.test(x.name)) || v[0];
-}
-function speak(text, lang, rate){
-  if(!('speechSynthesis' in window) || !text) return;
-  unlockTTS();
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(String(text).replace(/[（(].*?[)）]/g,''));
-    u.lang = lang || 'en-US';
-    u.rate = rate || (S.age==='k2' ? .78 : .88);
-    const v = pickVoice(u.lang); if(v) u.voice = v;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
-function say(text, lang, rate){ speak(text, lang, rate); }          // 手動按 🔊
-function autoSay(text){ if(TTS.on) setTimeout(()=>speak(text,'en-US'), 260); }  // 自動朗讀題目
-function toggleTTS(){
-  TTS.on = !TTS.on; unlockTTS();
-  const b = document.getElementById('ttsBtn');
-  b.classList.toggle('on', TTS.on); b.textContent = TTS.on ? '🔊 朗讀' : '🔇 靜音';
-  if(!TTS.on){ try{speechSynthesis.cancel()}catch(e){} }
-}
+const DUR = {en:'How long has it been?', zh:'從什麼時候開始？', multi:false, o:[
+  {en:'Just now',       zh:'剛剛才開始'},
+  {en:'Earlier today',  zh:'今天稍早'},
+  {en:'Since yesterday',zh:'昨天開始'},
+  {en:'A few days',     zh:'好幾天了'}
+]};
+const PAIN = {en:'How bad is it?', zh:'有多不舒服？', multi:false, o:[
+  {en:'A little (1–3)',  zh:'輕微 1–3 分'},
+  {en:'Medium (4–6)',    zh:'中等 4–6 分'},
+  {en:'A lot (7–10)',    zh:'嚴重 7–10 分', flag:'學生自述疼痛 7 分以上 — 需實際評估並考慮通知家長'}
+]};
 
-/* =======================================================================
-   年齡層
-   ======================================================================= */
-const AGES = [
-  {id:'k2',  en:'Kindergarten – Grade 2', zh:'幼稚園～小二', ico:'🧸', note:'字少、圖大、表情量表、自動朗讀'},
-  {id:'g35', en:'Grade 3 – 5',            zh:'小三～小五',   ico:'🎒', note:'表情量表，題目稍完整'},
-  {id:'g68', en:'Grade 6 – 8',            zh:'六年級～國中', ico:'🏀', note:'0–10 疼痛分數，加入月經、情緒'},
-  {id:'g912',en:'Grade 9 – 12',           zh:'高中',         zh2:'', ico:'🎓', note:'完整選項，含私下談話與物質相關'}
-];
-const ALL = ['k2','g35','g68','g912'];
-const okAge = o => !o.ages || o.ages.includes(S.age);
-
-/* =======================================================================
-   共用題組
-   ======================================================================= */
-const DUR_K = {ages:['k2','g35'], en:'When did it start?', zh:'什麼時候開始的？', o:[
-  {en:'Just now', zh:'剛剛', ico:'⏱'},
-  {en:'This morning', zh:'今天早上', ico:'🌤'},
-  {en:'Yesterday', zh:'昨天', ico:'🌙'},
-  {en:'A long time', zh:'很久了', ico:'📅'}
-]};
-const DUR_T = {ages:['g68','g912'], en:'How long has it been going on?', zh:'持續多久了？', o:[
-  {en:'Just started', zh:'剛開始'},
-  {en:'Earlier today', zh:'今天稍早'},
-  {en:'Since yesterday', zh:'昨天開始'},
-  {en:'Several days', zh:'好幾天了'}
-]};
-const PAIN_K = {ages:['k2','g35'], en:'How much does it hurt?', zh:'有多痛？', o:[
-  {en:'A little bit', zh:'一點點', ico:'🙂'},
-  {en:'Some', zh:'有點痛', ico:'😕'},
-  {en:'A lot', zh:'很痛', ico:'😣', flag:'學生表達「很痛」— 需實際評估並考慮通知家長'},
-  {en:'The worst', zh:'超級痛', ico:'😭', flag:'學生表達最高級疼痛 — 立即評估生命徵象並通知家長'}
-]};
-const PAIN_T = {ages:['g68','g912'], en:'Rate your pain from 1 to 10', zh:'疼痛分數 1–10', o:[
-  {en:'1 – 3  mild', zh:'輕微'},
-  {en:'4 – 6  moderate', zh:'中等'},
-  {en:'7 – 10  severe', zh:'嚴重', flag:'疼痛 7 分以上 — 需完整評估並通知家長'}
-]};
-const DUR = [DUR_K, DUR_T], PAIN = [PAIN_K, PAIN_T];
-
-/* =======================================================================
-   主資料
-   cat  { id, en, zh, ico, tint, ages?, q[], plan[], dispo, say[] }
-   q    { en, zh, multi?, ages?, o[] }
-   o    { en, zh, ico?, ages?, flag?, act?[] }
-   ======================================================================= */
 const DATA = [
-
-{ id:'head', en:'Headache or dizzy', zh:'頭痛、頭暈', ico:'🤕', tint:'#FDE8E4',
+{ id:'head', en:'Headache / Dizzy', zh:'頭痛、頭暈', ico:'🤕',
   q:[
-    {en:'What do you feel?', zh:'是哪一種？', o:[
-      {en:'My head hurts', zh:'頭痛', ico:'🤕'},
-      {en:'I feel dizzy', zh:'頭暈、站不穩', ico:'💫'},
-      {en:'Both', zh:'兩種都有', ico:'😖'}
+    {en:'What do you feel?', zh:'是哪一種？', multi:false, o:[
+      {en:'Headache', zh:'頭痛'},
+      {en:'Dizzy, light-headed', zh:'頭暈、站不穩'},
+      {en:'Both', zh:'兩種都有'}
     ]},
-    ...DUR, ...PAIN,
-    {en:'Anything else? Tap all', zh:'還有什麼？可複選', multi:true, o:[
-      {en:'I hit my head', zh:'有撞到頭', ico:'💥', flag:'頭部外傷 — 啟動 head injury / concussion protocol，務必通知家長',
-        act:['執行 neuro check：意識、瞳孔、平衡、記憶與定向感，每 15 分鐘一次，至少 1 小時',
-             '詢問是否失去意識、是否記得受傷經過；有嘔吐、嗜睡、複視、抽搐 → 立即 911',
-             '填寫 head injury report，通知家長並提供 concussion fact sheet（返家後 24–48 小時觀察）',
-             '當日不得再參加體育課或運動（return-to-play 須醫師評估）']},
-      {en:'I want to throw up', zh:'想吐', ico:'🤢', flag:'頭痛合併噁心嘔吐 — 需排除頭部外傷、感染與腦壓問題'},
-      {en:'I feel hot', zh:'覺得發燒', ico:'🌡', act:['量體溫並記錄']},
-      {en:'I cannot see well', zh:'視線模糊', ico:'👁', flag:'視力改變 — 通知家長就醫，學生不可自行離校'},
-      {en:'I did not eat breakfast', zh:'沒吃早餐', ico:'🥣', act:['低血糖可能：給予餅乾或果汁，15 分鐘後重新評估']},
-      {en:'I did not sleep well', zh:'沒睡好', ico:'😴'},
-      {en:'I was on a screen a long time', zh:'一直看螢幕', ico:'💻', ages:['g35','g68','g912']},
-      {en:'Nothing else', zh:'沒有了', ico:'✋'}
+    DUR, PAIN,
+    {en:'Anything else? (tap all)', zh:'還有什麼？可複選', multi:true, o:[
+      {en:'I hit my head', zh:'我有撞到頭', flag:'頭部外傷 — 啟動 head injury protocol，務必通知家長',
+        act:['執行 neuro check：意識、瞳孔、平衡、記憶，每 15 分鐘一次共 1 小時','填寫 head injury report，通知家長並提供 head injury fact sheet（返家後 24 小時觀察）']},
+      {en:'I feel like throwing up', zh:'覺得想吐', flag:'頭痛合併嘔吐 — 需排除頭部外傷與感染'},
+      {en:'I feel hot / feverish', zh:'覺得發燒', act:['量耳溫或額溫並記錄']},
+      {en:'My vision is blurry', zh:'視線模糊', flag:'視力改變 — 需通知家長，不宜自行返家'},
+      {en:'No breakfast today', zh:'今天沒吃早餐', act:['低血糖可能：給予餅乾或果汁，15 分鐘後重新評估']},
+      {en:'I didn\'t sleep well', zh:'昨晚沒睡好'},
+      {en:'Nothing else', zh:'沒有了'}
     ]}
   ],
-  plan:['測量體溫、脈搏、血壓並記錄','詢問今日進食、飲水、睡眠、用眼與壓力情形','安置於安靜微暗處休息 15–20 分鐘，給予溫開水','15–20 分鐘後重新評估疼痛與活動力，可返班者註記返班時間'],
-  dispo:'單純頭痛休息後緩解 → 返班。合併撞到頭、嘔吐、視力改變、發燒或疼痛未緩解 → 通知家長帶回就醫。',
-  say:[{en:'Sit here and rest for fifteen minutes. I will check on you.', zh:'坐在這裡休息十五分鐘，我會再來看你。'},
+  plan:['測量體溫、脈搏、血壓，並記錄','詢問今日進食、飲水、睡眠與用眼情形','安置於安靜微暗處平躺或坐臥休息 15–20 分鐘，給予溫開水','15–20 分鐘後重新評估；改善即可返回教室，並註記回教室時間'],
+  dispo:'多數可休息後返班。若合併撞到頭、嘔吐、視力改變、發燒或疼痛未緩解 → 通知家長帶回並就醫。',
+  say:[{en:'Sit here and rest for 15 minutes. I will check on you.', zh:'先坐在這裡休息 15 分鐘，我會再來看你。'},
        {en:'Please drink some water.', zh:'喝一點水。'},
        {en:'Did you hit your head today?', zh:'今天有撞到頭嗎？'}]
 },
 
-{ id:'tummy', en:'Stomach ache', zh:'肚子痛、想吐', ico:'🤢', tint:'#FBEEDC',
+{ id:'tummy', en:'Stomach ache / Throwing up', zh:'肚子痛、想吐', ico:'🤢',
   q:[
-    {en:'What is happening?', zh:'是哪一種？可複選', multi:true, o:[
-      {en:'My tummy hurts', zh:'肚子痛', ico:'😣'},
-      {en:'I feel like throwing up', zh:'想吐', ico:'🤢'},
-      {en:'I threw up', zh:'已經吐了', ico:'🤮', flag:'已嘔吐 — 依校規通常需通知家長帶回，並符合返校規定（多為症狀停止 24 小時）'},
-      {en:'Diarrhea', zh:'腹瀉', ico:'🚻', flag:'腹瀉 — 注意腸胃炎群聚，加強手部衛生並依規定通報'},
-      {en:'I need the bathroom', zh:'想上廁所', ico:'🚽'}
+    {en:'What is happening?', zh:'是哪一種？', multi:true, o:[
+      {en:'Stomach hurts', zh:'肚子痛'},
+      {en:'I feel like throwing up', zh:'想吐、噁心'},
+      {en:'I threw up', zh:'已經吐了', flag:'已嘔吐 — 依校規多需通知家長帶回，並符合返校規定'},
+      {en:'Diarrhea', zh:'腹瀉', flag:'腹瀉 — 注意腸胃炎群聚，需通報'},
+      {en:'I need the bathroom', zh:'想上廁所'}
     ]},
-    {en:'Where does it hurt? Point on your body.', zh:'哪裡痛？', o:[
-      {en:'Top of my tummy', zh:'上腹（胃的位置）'},
-      {en:'Around my belly button', zh:'肚臍周圍'},
-      {en:'Lower right side', zh:'右下腹', flag:'右下腹痛 — 需排除闌尾炎；禁食禁水、不給止痛藥，通知家長就醫',
-        act:['評估反彈痛、右下腹壓痛、走路或跳躍是否加劇、有無發燒','禁食禁水，立即通知家長直接送醫']},
-      {en:'Lower tummy', zh:'下腹'},
+    {en:'Where does it hurt?', zh:'痛在哪裡？', multi:false, o:[
+      {en:'Upper belly', zh:'上腹（胃的位置）'},
+      {en:'Around the belly button', zh:'肚臍周圍'},
+      {en:'Lower right side', zh:'右下腹', flag:'右下腹痛 — 需排除闌尾炎，勿給止痛藥或食物，通知家長就醫',
+        act:['評估反彈痛、走路或跳躍是否加劇、有無發燒','禁食禁水，立即通知家長送醫']},
+      {en:'Lower belly', zh:'下腹'},
       {en:'All over', zh:'整個肚子'}
     ]},
-    ...DUR, ...PAIN,
+    DUR, PAIN,
     {en:'Anything else?', zh:'還有什麼？可複選', multi:true, o:[
-      {en:'I feel hot', zh:'覺得發燒', ico:'🌡', act:['量體溫並記錄']},
-      {en:'I ate something different today', zh:'吃了不一樣的東西', ico:'🍔'},
-      {en:'It is my period', zh:'月經來了', ico:'🌸', ages:['g35','g68','g912']},
-      {en:'I am worried about something', zh:'有事情讓我很緊張', ico:'😟',
-        act:['考慮情境性腹痛：休息、腹式呼吸，必要時轉介 school counselor']},
-      {en:'I did not eat today', zh:'今天沒吃東西', ico:'🥣'},
-      {en:'Nothing else', zh:'沒有了', ico:'✋'}
+      {en:'I feel hot / feverish', zh:'覺得發燒', act:['量體溫並記錄']},
+      {en:'I ate something unusual', zh:'吃了不一樣的東西'},
+      {en:'It is my period', zh:'月經來了'},
+      {en:'I am worried about a test', zh:'考試或事情讓我緊張', act:['考慮情境性腹痛：休息、腹式呼吸，必要時轉介 school counselor']},
+      {en:'Nothing else', zh:'沒有了'}
     ]}
   ],
-  plan:['視診腹部、輕觸四象限評估壓痛與反彈痛，記錄有無發燒','未排除急腹症前禁食固體、不給止痛藥，可小口溫開水','側臥休息 15–20 分鐘，鼓勵先如廁','15–20 分鐘後重新評估疼痛分數、腹脹與活動力'],
-  dispo:'單純腹痛緩解 → 返班。嘔吐、腹瀉、發燒、右下腹痛或疼痛加劇 → 通知家長帶回／就醫。',
+  plan:['視診腹部、觸診四象限，評估壓痛與反彈痛，記錄有無發燒','先禁食固體，可小口溫開水；未排除急腹症前不給止痛藥','側臥休息 15–20 分鐘，鼓勵先如廁','15–20 分鐘後重新評估疼痛分數並記錄'],
+  dispo:'單純腹痛且緩解 → 返班。嘔吐、腹瀉、發燒、右下腹痛或疼痛加劇 → 通知家長帶回／就醫。',
   say:[{en:'Point with one finger to where it hurts the most.', zh:'用一根手指指出最痛的地方。'},
        {en:'Do not eat anything yet. Small sips of water only.', zh:'先不要吃東西，只小口喝水。'},
        {en:'Do you need the bathroom first?', zh:'要不要先去廁所？'}]
 },
 
-{ id:'cut', en:'Cut, scrape or bleeding', zh:'割傷、擦傷、流血', ico:'🩹', tint:'#FCE4E4',
+{ id:'cut', en:'Cut / Scrape / Bleeding', zh:'割傷、擦傷、流血', ico:'🩹',
   q:[
-    {en:'Where is the boo-boo?', zh:'受傷部位？', o:[
-      {en:'Head or face', zh:'頭部或臉部', ico:'🙂', flag:'頭臉部傷口 — 出血多、易留疤，需通知家長並評估是否需縫合'},
-      {en:'Hand or arm', zh:'手或手臂', ico:'💪'},
-      {en:'Knee or leg', zh:'膝蓋或腿', ico:'🦵'},
-      {en:'Somewhere else', zh:'其他部位', ico:'🧍'}
+    {en:'Where is it?', zh:'受傷部位？', multi:false, o:[
+      {en:'Head or face', zh:'頭部或臉部', flag:'頭臉部傷口 — 出血多、易留疤，需通知家長'},
+      {en:'Hand or arm', zh:'手或手臂'},
+      {en:'Knee or leg', zh:'膝蓋或腿'},
+      {en:'Somewhere else', zh:'其他部位'}
     ]},
-    {en:'Is it still bleeding?', zh:'還在流血嗎？', o:[
-      {en:'It stopped', zh:'已經止住了', ico:'✅'},
-      {en:'A little bit', zh:'還有一點', ico:'💧'},
-      {en:'Still bleeding a lot', zh:'流很多', ico:'🩸', flag:'持續出血 — 直接加壓 10 分鐘不中斷；仍無法止血立即送醫'}
+    {en:'Is it still bleeding?', zh:'還在流血嗎？', multi:false, o:[
+      {en:'It stopped', zh:'已經止住了'},
+      {en:'A little', zh:'還有一點'},
+      {en:'Still bleeding a lot', zh:'流很多', flag:'持續出血 — 直接加壓 10 分鐘不中斷；無法止血須立即送醫'}
     ]},
-    {en:'How did it happen?', zh:'怎麼受傷的？', o:[
-      {en:'I fell down', zh:'跌倒', ico:'🤸'},
-      {en:'Something sharp cut me', zh:'被尖銳物割到', ico:'✂️', flag:'銳器傷 — 確認破傷風疫苗史，評估縫合需求',
-        act:['詢問並記錄最近一次破傷風疫苗時間','傷口有玻璃、金屬或異物殘留 → 勿自行挖除，直接送醫']},
-      {en:'An animal or a person bit me', zh:'被動物或人咬到', ico:'🐕', flag:'咬傷 — 感染風險高，須通知家長就醫評估抗生素與疫苗',
-        act:['大量清水沖洗 5 分鐘以上，記錄咬傷者／動物來源','依校規通報行政單位']},
-      {en:'During PE or sports', zh:'體育課或運動時', ico:'⚽'}
+    {en:'How did it happen?', zh:'怎麼受傷的？', multi:false, o:[
+      {en:'I fell down', zh:'跌倒'},
+      {en:'Something sharp cut me', zh:'被尖銳物割到', flag:'銳器傷 — 確認破傷風疫苗史，評估是否需縫合'},
+      {en:'An animal or person bit me', zh:'被動物或人咬到', flag:'咬傷 — 感染風險高，須通知家長就醫評估抗生素與疫苗'},
+      {en:'During sports or PE', zh:'運動時受傷'}
     ]}
   ],
-  plan:['洗手並戴手套（standard precaution），血液污染物依規定處理','以生理食鹽水或流動清水沖洗，清除砂石異物','乾紗布直接加壓止血 5–10 分鐘，勿反覆掀開查看','止血後塗抗菌藥膏、覆蓋無菌敷料並固定','記錄傷口大小、深度與位置；必要時拍照存檔'],
-  dispo:'淺層擦傷處理後返班。傷口深、長度超過約 1 公分、傷口邊緣分離、貫穿傷、咬傷或無法止血 → 通知家長就醫（縫合黃金時間約 6–8 小時）。',
+  plan:['洗手、戴手套（standard precaution）','以生理食鹽水或流動清水沖洗傷口，清除砂石異物','乾紗布直接加壓止血 5–10 分鐘，勿反覆掀開查看','止血後塗抗菌藥膏、覆蓋無菌敷料並固定','確認傷口長度與深度，拍照或圖示記錄於就診紀錄'],
+  dispo:'淺層擦傷處理後返班，並告知敷料保持乾燥。傷口深、超過約 1 公分、脂肪外露、貫穿傷、咬傷或無法止血 → 通知家長就醫（縫合黃金時間約 6–8 小時）。',
   say:[{en:'I need to clean it with water first. It may sting a little.', zh:'我要先用水沖乾淨，可能會有點刺痛。'},
-       {en:'Press right here and do not let go.', zh:'壓住這裡，不要放開。'},
-       {en:'You are being very brave. Almost done.', zh:'你很勇敢，快好了。'}]
+       {en:'Press here and do not let go.', zh:'壓住這裡，不要放開。'},
+       {en:'Keep the bandage dry today.', zh:'今天保持敷料乾燥。'}]
 },
 
-{ id:'sprain', en:'I hurt my arm or leg', zh:'扭傷、撞傷、骨骼肌肉', ico:'🦵', tint:'#E6EDF9',
+{ id:'sprain', en:'Hurt my arm or leg', zh:'扭傷、撞傷、骨骼肌肉', ico:'🦵',
   q:[
-    {en:'Which part?', zh:'哪個部位？', o:[
-      {en:'Ankle or foot', zh:'腳踝或腳', ico:'🦶'},
-      {en:'Knee or leg', zh:'膝蓋或腿', ico:'🦵'},
-      {en:'Wrist or hand', zh:'手腕或手', ico:'🖐'},
-      {en:'Finger', zh:'手指', ico:'👆'},
-      {en:'Shoulder or arm', zh:'肩膀或手臂', ico:'💪'},
-      {en:'Neck or back', zh:'頸部或背部', ico:'🧍', flag:'頸／背部受傷 — 未排除脊椎損傷前不要移動學生，手動穩定頭頸並啟動 EMS'}
+    {en:'Which part?', zh:'哪個部位？', multi:false, o:[
+      {en:'Ankle or foot', zh:'腳踝或腳'},
+      {en:'Knee or leg', zh:'膝蓋或腿'},
+      {en:'Wrist or hand', zh:'手腕或手'},
+      {en:'Finger', zh:'手指'},
+      {en:'Shoulder or arm', zh:'肩膀或手臂'},
+      {en:'Neck or back', zh:'頸部或背部', flag:'頸／背部受傷 — 未排除脊椎損傷前不要移動學生'}
     ]},
-    {en:'Can you move it?', zh:'還能動嗎？', o:[
-      {en:'Yes, it just hurts', zh:'可以動，只是會痛', ico:'🙂'},
-      {en:'A little, it is hard', zh:'可以但很困難', ico:'😕'},
-      {en:'No, I cannot move it', zh:'完全不能動', ico:'🚫', flag:'無法活動或無法承重 — 疑似骨折，固定後通知家長送醫'}
+    {en:'Can you move it?', zh:'還能動嗎？', multi:false, o:[
+      {en:'Yes, it just hurts', zh:'可以動，只是會痛'},
+      {en:'A little, it is hard', zh:'可以但很困難'},
+      {en:'No, I cannot move it', zh:'完全不能動', flag:'無法活動或無法承重 — 疑似骨折，需固定並通知家長就醫'}
     ]},
-    {en:'What does it look like? Tap all', zh:'外觀如何？可複選', multi:true, o:[
-      {en:'Swollen', zh:'腫起來', ico:'🎈'},
-      {en:'Bruised', zh:'瘀青', ico:'🟣'},
-      {en:'It looks bent or crooked', zh:'看起來變形歪掉', ico:'⚠️', flag:'肢體變形 — 高度疑似骨折或脫臼，原位固定，勿嘗試復位，立即送醫'},
-      {en:'Numb or tingling', zh:'麻麻的、沒感覺', ico:'⚡', flag:'感覺異常 — 注意神經血管受損，評估遠端脈搏並立即送醫'},
-      {en:'It looks normal', zh:'看起來正常', ico:'✅'}
+    {en:'What does it look like?', zh:'外觀怎麼樣？', multi:true, o:[
+      {en:'Swollen', zh:'腫起來'},
+      {en:'Bruised', zh:'瘀青'},
+      {en:'It looks bent or out of place', zh:'看起來變形或歪掉', flag:'肢體變形 — 高度疑似骨折或脫臼，原位固定，勿嘗試復位，立即送醫'},
+      {en:'Numb or tingling', zh:'麻麻的、沒感覺', flag:'感覺異常 — 注意神經血管受損，立即送醫'},
+      {en:'It looks normal', zh:'看起來正常'}
     ]},
-    ...PAIN
+    PAIN
   ],
-  plan:['依 RICE：休息、冰敷、加壓、抬高','冰敷每次 15 分鐘，中間隔毛巾，勿直接接觸皮膚','評估腫脹、變形、活動度、遠端脈搏與感覺','彈性繃帶加壓，患肢抬高高於心臟','15–20 分鐘後重新評估能否行走或抓握並記錄'],
-  dispo:'輕度扭挫傷 → 冰敷後返班，通知家長回家續冰敷觀察。變形、無法承重或抓握、麻木、劇痛 → 固定後立即通知家長就醫。',
+  plan:['依 RICE 處理：休息、冰敷、加壓、抬高','冰敷每次 15 分鐘，中間隔毛巾，勿直接接觸皮膚','評估腫脹、變形、活動度、遠端脈搏與感覺','可用彈性繃帶加壓，抬高患肢高於心臟','15–20 分鐘後重新評估，記錄能否行走或抓握'],
+  dispo:'輕度扭挫傷 → 冰敷後返班，通知家長回家續冰敷並觀察。變形、無法承重／抓握、麻木或劇痛 → 固定後立即通知家長就醫排除骨折。',
   say:[{en:'Can you stand on it?', zh:'這隻腳可以站嗎？'},
-       {en:'I will put ice on it for fifteen minutes.', zh:'我幫你冰敷十五分鐘。'},
-       {en:'Wiggle your fingers and toes for me.', zh:'動一動手指和腳趾給我看。'}]
+       {en:'I will put ice on it for 15 minutes.', zh:'我幫你冰敷 15 分鐘。'},
+       {en:'Try to move your fingers/toes for me.', zh:'動一下手指／腳趾給我看。'}]
 },
 
-{ id:'fever', en:'Fever, cold or sore throat', zh:'發燒、感冒、喉嚨痛', ico:'🤒', tint:'#FDE8E4',
+{ id:'fever', en:'Fever / Cold / Sore throat', zh:'發燒、感冒、喉嚨痛', ico:'🤒',
   q:[
-    {en:'What do you have? Tap all', zh:'有哪些症狀？可複選', multi:true, o:[
-      {en:'I feel hot or cold', zh:'發燒、發冷', ico:'🌡'},
-      {en:'Sore throat', zh:'喉嚨痛', ico:'😖'},
-      {en:'Cough', zh:'咳嗽', ico:'😷'},
-      {en:'Runny or stuffy nose', zh:'流鼻水、鼻塞', ico:'🤧'},
-      {en:'My body aches', zh:'全身痠痛', ico:'🧍'},
-      {en:'Headache', zh:'頭痛', ico:'🤕'}
+    {en:'What do you have?', zh:'有哪些症狀？可複選', multi:true, o:[
+      {en:'I feel hot / feverish', zh:'覺得發燒、發冷'},
+      {en:'Sore throat', zh:'喉嚨痛'},
+      {en:'Cough', zh:'咳嗽'},
+      {en:'Runny or stuffy nose', zh:'流鼻水、鼻塞'},
+      {en:'Body aches', zh:'全身痠痛'},
+      {en:'Headache', zh:'頭痛'}
     ]},
-    ...DUR,
+    DUR,
     {en:'Anything else?', zh:'還有什麼？可複選', multi:true, o:[
-      {en:'Hard to breathe', zh:'呼吸困難', ico:'😮‍💨', flag:'呼吸困難 — 立即評估呼吸速率與血氧，必要時啟動 EMS'},
-      {en:'A rash on my skin', zh:'身上有紅疹', ico:'🔴', flag:'發燒合併皮疹 — 隔離並通知家長就醫，排除傳染病'},
-      {en:'Someone at home is sick', zh:'家裡有人生病', ico:'🏠'},
-      {en:'I threw up', zh:'有嘔吐', ico:'🤮'},
-      {en:'Nothing else', zh:'沒有了', ico:'✋'}
+      {en:'Hard to breathe', zh:'呼吸困難', flag:'呼吸困難 — 立即評估呼吸速率與血氧，必要時啟動 EMS'},
+      {en:'Rash on my skin', zh:'身上有紅疹', flag:'發燒合併皮疹 — 需隔離並通知家長就醫排除傳染病'},
+      {en:'Someone at home is sick', zh:'家裡有人生病'},
+      {en:'I threw up', zh:'有嘔吐'},
+      {en:'Nothing else', zh:'沒有了'}
     ]}
   ],
-  plan:['量體溫並記錄（耳溫或額溫），同時測脈搏與呼吸','≥ 100.4°F（38.0°C）視為發燒：安置隔離區、戴口罩、限制接觸','通知家長盡快帶回；等待期間給予水分與休息','告知返校條件：未使用退燒藥情況下退燒滿 24 小時','清潔接觸表面，依學校規定進行傳染病監測通報'],
-  dispo:'體溫 ≥ 100.4°F 或呼吸道症狀合併倦怠 → 隔離並通知家長帶回。僅輕微鼻塞、無發燒 → 可返班觀察。',
+  plan:['量體溫並記錄（耳溫或額溫），同時測脈搏與呼吸','≥ 100.4°F（38.0°C）：視為發燒，安置於隔離區並戴口罩','通知家長盡快帶回；等待期間給予水分與休息','依校規告知返校條件：不使用退燒藥情況下退燒滿 24 小時','清潔接觸表面，依學校規定通報傳染病監測'],
+  dispo:'體溫 ≥ 100.4°F 或有呼吸道症狀合併倦怠 → 隔離並通知家長帶回。僅輕微鼻塞、無發燒 → 可返班觀察。',
   say:[{en:'I need to take your temperature.', zh:'我要幫你量體溫。'},
        {en:'Please put on a mask and sit over there.', zh:'請戴上口罩，坐到那邊。'},
-       {en:'I am going to call your parents to pick you up.', zh:'我會打電話請家長來接你。'}]
+       {en:'I am calling your parent to pick you up.', zh:'我會打電話請家長來接你。'}]
 },
 
-{ id:'enc', en:'Nose, eyes or ears', zh:'鼻血、眼睛、耳朵', ico:'👃', tint:'#E4F0EE',
+{ id:'enc', en:'Nose / Eye / Ear', zh:'鼻血、眼睛、耳朵', ico:'👃',
   q:[
-    {en:'Which one?', zh:'哪個部位？', o:[
-      {en:'My nose is bleeding', zh:'流鼻血', ico:'🩸',
-        act:['坐直、頭稍向前傾，不要後仰','捏住鼻翼柔軟處連續 10 分鐘不放開，同時鼻樑冰敷','止血後 1 小時內勿擤鼻、揉鼻或劇烈活動']},
-      {en:'Something is in my eye', zh:'眼睛跑進東西', ico:'👁',
-        act:['以生理食鹽水或洗眼器由內眥往外沖洗 15 分鐘','絕對不要揉眼；若為化學物質，邊沖洗邊安排送醫','沖洗後仍有異物感、疼痛或視力模糊 → 眼科就診']},
-      {en:'My eye is red and itchy', zh:'眼睛紅、癢', ico:'😳',
+    {en:'Which one?', zh:'哪個部位？', multi:false, o:[
+      {en:'Nosebleed', zh:'流鼻血',
+        act:['坐直、頭稍前傾，勿後仰','捏住鼻翼柔軟處連續 10 分鐘不放開，同時鼻樑冰敷','止血後 1 小時內勿擤鼻、揉鼻、劇烈活動']},
+      {en:'Something in my eye', zh:'眼睛跑進東西',
+        act:['以生理食鹽水或洗眼器由內眥往外沖洗 15 分鐘','絕對不要揉眼；若有化學物質，邊沖邊通知家長送醫','沖洗後仍有異物感、疼痛或視力模糊 → 眼科就診']},
+      {en:'My eye is red and itchy', zh:'眼睛紅、癢',
         act:['疑似結膜炎：勿共用毛巾，加強洗手','依校規隔離並通知家長就醫']},
-      {en:'My ear hurts', zh:'耳朵痛', ico:'👂',
-        act:['不要沖洗或滴任何藥水，不使用棉棒','通知家長就醫評估中耳炎或外耳道炎']},
-      {en:'Something is stuck in my nose or ear', zh:'有東西塞在鼻子或耳朵', ico:'🫙', ages:['k2','g35'],
-        flag:'鼻腔／外耳道異物 — 不可自行取出，通知家長就醫；注意鈕扣電池為急症',
-        act:['詢問塞入物品與時間；若為鈕扣電池或磁鐵 → 立即送醫，屬急症','鼻腔異物可請學生壓住健側鼻孔用力擤氣一次，勿反覆嘗試']},
-      {en:'I cannot hear well', zh:'聽不太清楚', ico:'🔇', flag:'聽力改變 — 通知家長就醫評估'}
+      {en:'Ear pain', zh:'耳朵痛',
+        act:['不要沖洗或滴任何藥水，不使用棉棒','通知家長就醫評估中耳炎']},
+      {en:'I cannot hear well', zh:'聽不太到', flag:'聽力改變 — 需通知家長就醫'}
     ]},
-    ...DUR,
-    {en:'Did something hit you there?', zh:'那裡有被撞到嗎？', o:[
-      {en:'Yes', zh:'有', ico:'💥', flag:'顏面／眼部外力撞擊 — 評估視力、眼球活動與骨性壓痛，通知家長'},
-      {en:'No', zh:'沒有', ico:'🙅'}
+    DUR,
+    {en:'Did something hit you there?', zh:'有被撞到嗎？', multi:false, o:[
+      {en:'Yes', zh:'有', flag:'外力撞擊臉部／眼部 — 需通知家長評估，注意眼球損傷'},
+      {en:'No', zh:'沒有'}
     ]}
   ],
-  plan:['依所選部位執行對應處置，記錄開始時間與止血／沖洗時間','評估出血量、視力、疼痛程度與有無外傷'],
-  dispo:'鼻血加壓 20 分鐘仍未止、眼睛外傷或視力改變、耳痛合併發燒或流膿、異物殘留 → 通知家長就醫。',
-  say:[{en:'Sit up and lean forward. Pinch your nose right here.', zh:'坐直、身體往前傾，捏住鼻子這裡。'},
+  plan:['依上方對應部位處置執行，並記錄開始與止血／沖洗時間','評估出血量、視力、疼痛程度'],
+  dispo:'鼻血經 20 分鐘加壓仍未止、眼睛外傷或視力改變、耳痛合併發燒或流膿 → 通知家長就醫。',
+  say:[{en:'Sit up and lean forward. Pinch your nose right here.', zh:'坐直、身體前傾，捏住鼻子這裡。'},
        {en:'Do not rub your eye. I will rinse it with water.', zh:'不要揉眼睛，我用生理食鹽水幫你沖。'},
-       {en:'Breathe through your mouth. You are doing great.', zh:'用嘴巴呼吸，你做得很好。'}]
+       {en:'Breathe through your mouth.', zh:'用嘴巴呼吸。'}]
 },
 
-{ id:'skin', en:'Rash, bug bite or allergy', zh:'紅疹、蟲咬、過敏', ico:'🐝', tint:'#FBEEDC',
+{ id:'skin', en:'Rash / Bite / Allergy', zh:'紅疹、蟲咬、過敏', ico:'🐝',
   q:[
-    {en:'What happened?', zh:'發生什麼事？', o:[
-      {en:'An itchy rash', zh:'會癢的紅疹', ico:'🔴'},
-      {en:'A bug bit me', zh:'被蟲咬', ico:'🦟'},
-      {en:'A bee stung me', zh:'被蜜蜂螫到', ico:'🐝',
-        act:['以硬卡片刮除螫針，勿用鑷子擠壓毒囊','冰敷並抬高患部，留置觀察 30 分鐘有無全身反應']},
-      {en:'I ate something I am allergic to', zh:'吃到會過敏的食物', ico:'🥜',
-        flag:'已知食物過敏暴露 — 立即取出該生 allergy action plan 與 EpiPen，全程留置觀察'},
-      {en:'Hives all over my body', zh:'全身蕁麻疹', ico:'🫨', flag:'廣泛性蕁麻疹 — 可能進展為全身性過敏反應，密切監測'},
-      {en:'A rash that is spreading', zh:'紅疹一直擴散', ico:'📈', flag:'快速擴散皮疹 — 通知家長就醫'}
+    {en:'What happened?', zh:'發生什麼事？', multi:false, o:[
+      {en:'Itchy rash', zh:'會癢的紅疹'},
+      {en:'Bug bite', zh:'蟲咬'},
+      {en:'Bee sting', zh:'蜜蜂螫傷', act:['以硬卡片刮除螫針，勿用鑷子擠壓毒囊','冰敷並抬高患部，觀察 30 分鐘有無全身反應']},
+      {en:'I ate something I am allergic to', zh:'吃到會過敏的食物', flag:'已知食物過敏暴露 — 立即查閱 allergy action plan，全程留置觀察'},
+      {en:'Hives all over', zh:'全身蕁麻疹', flag:'廣泛性蕁麻疹 — 注意可能進展為全身性過敏反應'}
     ]},
-    {en:'Do you have any of these? Very important', zh:'有沒有以下情況？非常重要', multi:true, o:[
-      {en:'My lips or face are swelling', zh:'嘴唇或臉腫起來', ico:'⚠️',
-        flag:'⚠ 血管性水腫 — 疑似 ANAPHYLAXIS：依 action plan 立即給 epinephrine 並撥 911'},
-      {en:'Hard to breathe or my throat feels tight', zh:'呼吸困難、喉嚨緊', ico:'🚨',
-        flag:'⚠ 呼吸道受累 — 立即 epinephrine 並撥 911，勿讓學生站立或行走'},
-      {en:'I feel dizzy or my heart is racing', zh:'頭暈、心跳很快', ico:'💗',
-        flag:'⚠ 循環症狀 — 疑似過敏性休克，平躺抬腿、啟動 EMS'},
-      {en:'I am throwing up', zh:'一直吐', ico:'🤮', flag:'過敏合併腸胃症狀 — 屬多系統受累，視同 anaphylaxis 處理'},
-      {en:'None of these', zh:'都沒有', ico:'✅'}
+    {en:'Do you have any of these? (important)', zh:'有沒有以下情況？非常重要', multi:true, o:[
+      {en:'My lips or face are swelling', zh:'嘴唇或臉腫起來', flag:'⚠ 血管性水腫 — 疑似 anaphylaxis，依 action plan 給 epinephrine 並打 911'},
+      {en:'Hard to breathe or throat feels tight', zh:'呼吸困難、喉嚨緊', flag:'⚠ 呼吸道受影響 — 立即 epinephrine 並打 911，勿讓學生站立行走'},
+      {en:'I feel dizzy or my heart is racing', zh:'頭暈、心跳很快', flag:'⚠ 循環症狀 — 疑似過敏性休克，平躺抬腿並啟動 EMS'},
+      {en:'It is spreading fast', zh:'很快擴散開'},
+      {en:'None of these', zh:'都沒有'}
     ]},
-    ...DUR
+    DUR
   ],
-  plan:['立即查詢該生 allergy action plan、EpiPen 授權與過敏史','局部反應：清水清潔、冰敷、避免搔抓；抗組織胺須有 standing order 與家長同意','全程留置觀察至少 30 分鐘，記錄皮疹範圍與變化','出現任何呼吸、循環或多系統症狀 → 立即 epinephrine（大腿外側肌肉）並撥 911','給藥後記錄時間與部位，用過的 EpiPen 交給救護人員'],
-  dispo:'單純局部蟲咬 → 冰敷後返班。任何口唇腫脹、呼吸或循環症狀 → 立即 epinephrine + 911 + 通知家長，即使症狀緩解仍須送醫觀察。',
+  plan:['立即查詢該生 allergy action plan、EpiPen 授權與既往史','局部反應：清水清潔、冰敷、避免搔抓；抗組織胺須有 standing order 與家長同意','全程留置觀察至少 30 分鐘，記錄皮疹範圍變化','出現任何呼吸、循環或多系統症狀 → 依 action plan 給 epinephrine，並立即撥打 911'],
+  dispo:'單純局部蟲咬 → 冰敷後返班。任何口唇腫脹、呼吸或循環症狀 → 立即 epinephrine + 911 + 通知家長。',
   say:[{en:'Does your throat feel tight?', zh:'喉嚨會覺得緊緊的嗎？'},
        {en:'Stay lying down. Do not stand up.', zh:'躺著不要起來，不要站起來。'},
        {en:'Do you have an EpiPen at school?', zh:'你在學校有放 EpiPen 嗎？'}]
 },
 
-{ id:'breath', en:'Hard to breathe / Asthma', zh:'呼吸困難、氣喘', ico:'🫁', tint:'#E6EDF9',
+{ id:'breath', en:'Hard to breathe / Asthma', zh:'呼吸困難、氣喘', ico:'🫁',
   q:[
-    {en:'What is happening? Tap all', zh:'現在的情況？可複選', multi:true, o:[
-      {en:'I have asthma', zh:'我有氣喘', ico:'🫁', act:['取出並依 asthma action plan 執行，確認 inhaler 授權文件']},
-      {en:'It is hard to breathe', zh:'呼吸困難', ico:'😮‍💨', flag:'呼吸窘迫 — 持續監測，給藥後 15 分鐘未改善即啟動 EMS'},
-      {en:'My chest feels tight', zh:'胸悶', ico:'🫀'},
-      {en:'I am coughing a lot', zh:'一直咳嗽', ico:'😷'},
-      {en:'It started after running', zh:'跑步後開始', ico:'🏃', act:['運動誘發型氣喘：停止活動，依 action plan 用藥後休息']}
+    {en:'What is happening?', zh:'現在的情況？', multi:true, o:[
+      {en:'I have asthma', zh:'我有氣喘', act:['查閱 asthma action plan 與 inhaler 授權文件']},
+      {en:'Hard to breathe', zh:'呼吸困難', flag:'呼吸窘迫 — 持續監測，15 分鐘未改善即啟動 EMS'},
+      {en:'My chest feels tight', zh:'胸悶'},
+      {en:'I am coughing a lot', zh:'一直咳嗽'},
+      {en:'It started after running', zh:'跑步後開始', act:['運動誘發型氣喘：停止活動，休息並依 action plan 用藥']}
     ]},
-    {en:'Can you talk in full sentences?', zh:'可以講完整句子嗎？', o:[
-      {en:'Yes', zh:'可以', ico:'🙂'},
-      {en:'Only a few words', zh:'只能講幾個字', ico:'⚠️', flag:'⚠ 僅能單字對話 — 重度發作：立即 rescue inhaler 並撥 911'},
-      {en:'I cannot talk', zh:'講不出話', ico:'🚨', flag:'⚠ 無法說話 — 立即撥 911、備 AED、持續給藥，不可離開學生身邊'}
+    {en:'Can you talk in full sentences?', zh:'可以講完整句子嗎？', multi:false, o:[
+      {en:'Yes', zh:'可以'},
+      {en:'Only a few words', zh:'只能講幾個字', flag:'⚠ 僅能單字對話 — 重度發作，立即給 rescue inhaler 並打 911'},
+      {en:'I cannot talk', zh:'講不出話', flag:'⚠ 無法說話 — 立即 911、備 AED、持續給藥'}
     ]},
-    {en:'Do you have your inhaler?', zh:'有帶吸入劑嗎？', o:[
-      {en:'Yes, with me', zh:'有，在身上', ico:'💨'},
-      {en:'It is in the health office', zh:'放在保健室', ico:'🏥'},
-      {en:'I do not have one', zh:'沒有', ico:'🚫', flag:'無可用 rescue inhaler — 若有校內 stock albuterol 依規定使用，否則提早啟動 EMS'}
+    {en:'Do you have your inhaler?', zh:'有帶吸入劑嗎？', multi:false, o:[
+      {en:'Yes, with me', zh:'有，在身上'},
+      {en:'It is in the health office', zh:'放在保健室'},
+      {en:'I do not have one', zh:'沒有'}
     ]}
   ],
-  plan:['讓學生坐直（tripod position），保持冷靜，避免平躺','依 asthma action plan 給 rescue inhaler（多為 albuterol，搭配 spacer）','監測呼吸速率、能否說完整句子、呼吸輔助肌使用、嘴唇顏色、血氧','給藥後 15 分鐘重新評估；未改善或惡化 → 立即 911 並通知家長','全程不得讓學生單獨留置或自行走去其他地方'],
+  plan:['讓學生坐直（tripod position），保持冷靜，避免平躺','依 asthma action plan 給予 rescue inhaler（多為 albuterol，含 spacer）','監測呼吸速率、能否說完整句子、有無使用呼吸輔助肌、嘴唇顏色、血氧','給藥後 15 分鐘重新評估；未改善或惡化 → 立即撥 911 並通知家長','全程不得讓學生單獨留置或自行走去其他地方'],
   dispo:'用藥後完全緩解 → 留觀 20 分鐘後返班並通知家長。未緩解、說話中斷、嘴唇發紺 → 911 送醫。',
   say:[{en:'Sit up straight. Breathe in slowly with me.', zh:'坐直，跟著我慢慢吸氣。'},
        {en:'Where is your inhaler?', zh:'你的吸入劑在哪裡？'},
-       {en:'Help is coming. Stay with me and keep breathing.', zh:'救護人員在路上了，看著我，繼續呼吸。'}]
+       {en:'Help is coming. Stay with me.', zh:'救護人員在路上了，看著我。'}]
 },
 
-{ id:'tooth', en:'Tooth or mouth', zh:'牙齒、口腔', ico:'🦷', tint:'#E4F0EE',
+{ id:'tooth', en:'Tooth / Mouth', zh:'牙齒、口腔', ico:'🦷',
   q:[
-    {en:'What happened?', zh:'發生什麼事？', o:[
-      {en:'My tooth hurts', zh:'牙齒痛', ico:'😖', act:['冷敷臉頰外側，溫鹽水漱口；勿將止痛藥直接放在牙齦上']},
-      {en:'My tooth got knocked out', zh:'牙齒被撞掉了', ico:'🦷',
-        flag:'撞落牙齒 — 恆牙需 30–60 分鐘內牙科處理，屬時效性急症',
-        act:['只拿牙冠，勿碰觸牙根、勿刷洗或擦拭','泡在牛奶或生理食鹽水中保存，立即通知家長直送牙科','乳牙不需回植，仍須牙科評估']},
-      {en:'My tooth is loose', zh:'牙齒在搖', ico:'🪥', ages:['k2','g35'], act:['乳牙自然鬆動：提供紗布，勿強行拔除，通知家長']},
-      {en:'My braces are hurting me', zh:'矯正器割到嘴巴', ico:'🦿', ages:['g35','g68','g912'],
-        act:['以正畸蠟覆蓋銳利處；突出鋼絲勿自行剪斷，通知家長安排矯正科']},
-      {en:'I bit my lip or tongue', zh:'咬到嘴唇或舌頭', ico:'👅',
-        act:['紗布加壓 10 分鐘並冰敷；口腔內傷口出血時間較長屬正常']}
+    {en:'What happened?', zh:'發生什麼事？', multi:false, o:[
+      {en:'Toothache', zh:'牙齒痛', act:['冷敷臉頰外側，以溫鹽水漱口，勿將藥物直接放在牙齦上']},
+      {en:'A tooth got knocked out', zh:'牙齒被撞掉了', flag:'撞落牙齒 — 恆牙需 30–60 分鐘內牙科處理',
+        act:['只拿牙冠，勿碰牙根、勿刷洗','泡在牛奶或生理食鹽水中保存，立即通知家長直送牙科','乳牙不需回植，仍須牙科評估']},
+      {en:'A tooth is loose', zh:'牙齒在搖'},
+      {en:'My braces are hurting me', zh:'矯正器割到嘴巴', act:['以正畸蠟覆蓋銳利處，突出鋼絲勿自行剪斷']},
+      {en:'I bit my lip or tongue', zh:'咬到嘴唇或舌頭', act:['紗布加壓 10 分鐘，冰敷；口腔內傷口出血較久屬正常']}
     ]},
-    ...PAIN,
-    {en:'Did you hit your face or head?', zh:'臉或頭有被撞到嗎？', o:[
-      {en:'Yes', zh:'有', ico:'💥', flag:'顏面外傷 — 同時評估頭部外傷與咬合是否對齊'},
-      {en:'No', zh:'沒有', ico:'🙅'}
+    PAIN,
+    {en:'Did you hit your face or head?', zh:'臉或頭有被撞到嗎？', multi:false, o:[
+      {en:'Yes', zh:'有', flag:'顏面外傷 — 同時評估頭部外傷與咬合是否對齊'},
+      {en:'No', zh:'沒有'}
     ]}
   ],
-  plan:['檢查口腔有無出血、牙齒缺損、鬆動或咬合異常','依上方對應處置執行並記錄事件時間','通知家長說明處置內容與就診時效'],
-  dispo:'撞落恆牙或咬合異常 → 立即牙科。單純牙痛或矯正器不適 → 處理後返班並通知家長安排牙醫。',
+  plan:['檢查口腔內有無出血、牙齒缺損、咬合異常','依上方對應處置執行，記錄事件時間','通知家長說明處置與建議就診時效'],
+  dispo:'撞落恆牙或咬合異常 → 立即牙科，屬時效性急症。單純牙痛或矯正器不適 → 處理後返班並通知家長安排牙醫。',
   say:[{en:'Do not touch the root. I will put it in milk.', zh:'不要碰牙根，我把它泡在牛奶裡。'},
        {en:'Bite down on this gauze for ten minutes.', zh:'咬住這塊紗布十分鐘。'},
        {en:'Rinse your mouth with this salt water.', zh:'用這個鹽水漱口。'}]
 },
 
-{ id:'heat', en:'Too hot / Sunburn / Thirsty', zh:'中暑、脫水、曬傷', ico:'☀️', tint:'#FBEEDC',
-  q:[
-    {en:'What is wrong?', zh:'怎麼了？', multi:true, o:[
-      {en:'I feel very hot and tired', zh:'很熱、很累', ico:'🥵'},
-      {en:'I am dizzy', zh:'頭暈', ico:'💫'},
-      {en:'I have a headache', zh:'頭痛', ico:'🤕'},
-      {en:'My muscles are cramping', zh:'肌肉抽筋', ico:'🦵'},
-      {en:'My skin is red and hot from the sun', zh:'皮膚被曬紅發燙', ico:'🔥',
-        act:['冷水濕敷曬傷處 15 分鐘，可塗蘆薈；水泡不可弄破','通知家長並提醒避免再曝曬']},
-      {en:'I feel sick after PE', zh:'體育課後很不舒服', ico:'⚽'}
-    ]},
-    {en:'Any of these?', zh:'有沒有這些？', multi:true, o:[
-      {en:'I stopped sweating', zh:'流不出汗', ico:'⚠️', flag:'⚠ 無汗合併高體溫 — 疑似熱中暑（heat stroke），立即積極降溫並撥 911'},
-      {en:'I feel confused or very sleepy', zh:'意識模糊、很想睡', ico:'🚨', flag:'⚠ 意識改變 — 熱中暑急症，立即撥 911，移至陰涼處積極降溫'},
-      {en:'I threw up', zh:'有吐', ico:'🤮', flag:'熱衰竭合併嘔吐 — 無法口服補水，需通知家長送醫'},
-      {en:'Just hot and tired', zh:'只是熱和累', ico:'😮‍💨'}
-    ]}
-  ],
-  plan:['立即移至陰涼冷氣處，鬆開衣物，平躺抬腿','測量體溫、脈搏、血壓並記錄','清醒可吞嚥者小口給予含電解質飲料或水（每 15 分鐘約 120–240 ml）','頸部、腋下、鼠蹊部冰敷或濕毛巾降溫，搭配電扇','30 分鐘未改善或有意識改變 → 撥 911 並持續降溫'],
-  dispo:'輕度熱衰竭補水休息後改善 → 留觀後返班，當日不再參加戶外活動並通知家長。意識改變、無汗、體溫過高 → 911。',
-  say:[{en:'Come sit in the cool room. Drink this slowly.', zh:'到涼快的地方坐著，慢慢喝這個。'},
-       {en:'Lie down and I will put a cold towel on you.', zh:'躺下來，我幫你放冰毛巾。'},
-       {en:'No more PE today.', zh:'今天不要再上體育課了。'}]
-},
-
-{ id:'faint', en:'I feel like I will faint', zh:'快昏倒、虛弱', ico:'💫', tint:'#E6EDF9',
-  q:[
-    {en:'What do you feel?', zh:'現在的感覺？', multi:true, o:[
-      {en:'Everything is spinning', zh:'天旋地轉', ico:'💫'},
-      {en:'My vision went dark', zh:'眼前發黑', ico:'🌑', flag:'眼前發黑 — 前暈厥症狀，立即平躺抬腿並監測生命徵象'},
-      {en:'I actually fainted', zh:'有昏倒過去', ico:'🚨', flag:'⚠ 曾失去意識 — 必須通知家長就醫，並確認跌倒時有無頭部撞擊',
-        act:['確認昏倒時間長度、有無抽搐、有無外傷','監測生命徵象每 10 分鐘，勿讓學生自行走動或離校']},
-      {en:'My heart is beating fast', zh:'心跳很快', ico:'💗'},
-      {en:'I feel weak', zh:'全身無力', ico:'😵'}
-    ]},
-    {en:'Before this happened...', zh:'發生前的情況？', multi:true, o:[
-      {en:'I did not eat today', zh:'今天沒吃東西', ico:'🥣', act:['評估低血糖：可測血糖，給予果汁或餅乾後 15 分鐘複評']},
-      {en:'I did not drink water', zh:'沒喝水', ico:'💧'},
-      {en:'I stood up too fast', zh:'突然站起來', ico:'⬆️'},
-      {en:'I was in the sun', zh:'剛剛在太陽下', ico:'☀️'},
-      {en:'I saw blood or got scared', zh:'看到血或被嚇到', ico:'😱'},
-      {en:'It happens to me often', zh:'常常這樣', ico:'🔁', flag:'反覆暈厥 — 需通知家長安排心臟科評估'}
-    ]}
-  ],
-  plan:['立即讓學生平躺、雙腿抬高 20–30 公分，勿讓其站立或自行走動','測量血壓（含坐姿與臥姿）、脈搏、體溫、血糖，並記錄','意識清楚可吞嚥時給予水或果汁，15 分鐘後複評','檢查有無跌倒造成的外傷或頭部撞擊','恢復後先坐起 5 分鐘無不適才可站立，且須有人陪同'],
-  dispo:'姿勢性頭暈補水後改善 → 留觀後由人陪同返班。曾真正失去意識、胸痛、心悸、反覆發作 → 通知家長就醫評估。',
-  say:[{en:'Lie down here and let me lift your legs.', zh:'躺下來，我幫你把腳抬高。'},
-       {en:'Did you faint, or just feel dizzy?', zh:'你是真的昏倒，還是只是頭暈？'},
-       {en:'Do not stand up yet. Sit first.', zh:'先不要站起來，先坐著。'}]
-},
-
-{ id:'lice', en:'My head is very itchy', zh:'頭很癢、疑似頭蝨', ico:'🪮', tint:'#F1E9F4', ages:['k2','g35','g68'],
-  q:[
-    {en:'What is happening?', zh:'情況是？', multi:true, o:[
-      {en:'My head itches a lot', zh:'頭很癢', ico:'🪮'},
-      {en:'It is worse at night', zh:'晚上更癢', ico:'🌙'},
-      {en:'Someone in my class has lice', zh:'班上有人有頭蝨', ico:'🏫'},
-      {en:'My scalp has bumps or scabs', zh:'頭皮有疹子或結痂', ico:'🔴', flag:'頭皮破皮結痂 — 注意續發細菌感染，通知家長就醫'}
-    ]}
-  ],
-  plan:['於明亮處以壓舌板或梳子檢查耳後、後頸髮際線，尋找活蝨與附著的蟲卵','戴手套並避免共用梳具；檢查後器具清潔消毒','確認有活體感染時，依校規通知家長帶回處理，並通知導師檢查接觸學生','提供家長處理說明：藥用洗劑、細齒梳每 2–3 天梳理、衣物寢具高溫清洗','多數學校已採 no-nit policy 改為治療後即可返校，依該校規定執行'],
-  dispo:'發現活蝨 → 通知家長當日或放學後處理，依校規決定返班時間。僅頭皮搔癢無蝨 → 返班並觀察。',
-  say:[{en:'I am going to check your hair. Sit still, please.', zh:'我要檢查你的頭髮，請坐好不要動。'},
-       {en:'Please do not share hats or combs with friends.', zh:'不要跟同學共用帽子或梳子。'},
-       {en:'This is not your fault. It happens to a lot of kids.', zh:'這不是你的錯，很多小朋友都會遇到。'}]
-},
-
-{ id:'bath', en:'I had an accident / wet clothes', zh:'尿濕、弄髒衣服', ico:'👖', tint:'#F1E9F4', ages:['k2','g35'],
-  q:[
-    {en:'What happened?', zh:'發生什麼事？', o:[
-      {en:'I wet my pants', zh:'尿濕褲子', ico:'💧'},
-      {en:'I had a bathroom accident', zh:'來不及上廁所', ico:'🚽'},
-      {en:'I spilled something on me', zh:'把東西灑到身上', ico:'🥤'},
-      {en:'I got mud or paint on me', zh:'弄髒了', ico:'🎨'}
-    ]},
-    {en:'How do you feel?', zh:'身體感覺？', multi:true, o:[
-      {en:'My tummy hurts', zh:'肚子痛', ico:'😣'},
-      {en:'It hurts when I pee', zh:'尿尿會痛', ico:'⚠️', flag:'排尿疼痛 — 疑似泌尿道感染，通知家長就醫'},
-      {en:'I need to go a lot', zh:'一直想上廁所', ico:'🔁', flag:'頻尿 — 排除泌尿道感染與高血糖，通知家長'},
-      {en:'I feel okay', zh:'還好', ico:'🙂'},
-      {en:'I feel embarrassed', zh:'覺得很丟臉', ico:'😞'}
-    ]}
-  ],
-  plan:['帶至隱密處協助更換乾淨衣物，維護學生自尊，避免在同學面前討論','髒衣物裝袋標示姓名，放學時交還家長','清潔皮膚並觀察有無紅疹或破皮','低調通知導師與家長，必要時在保健室備妥該生替換衣物','反覆發生 → 評估泌尿道感染、便祕或情緒因素，建議家長就醫'],
-  dispo:'更換衣物後返班。合併排尿疼痛、頻尿或反覆失禁 → 通知家長安排就醫。',
-  say:[{en:'It is okay. This happens sometimes. Let us get you clean clothes.', zh:'沒關係，這有時候會發生，我們去換乾淨的衣服。'},
-       {en:'You can change in here. I will wait outside.', zh:'你在這裡換，我在外面等。'},
-       {en:'Nobody needs to know. You can go back to class now.', zh:'不用跟別人說，你現在可以回教室了。'}]
-},
-
-{ id:'period', en:'Period / Cramps', zh:'月經相關', ico:'🌸', tint:'#F1E9F4', ages:['g35','g68','g912'],
+{ id:'period', en:'Period / Cramps', zh:'月經相關', ico:'🌸',
   q:[
     {en:'What do you need?', zh:'需要什麼幫忙？', multi:true, o:[
-      {en:'I need a pad or tampon', zh:'需要衛生棉／棉條', ico:'🩷', act:['提供衛生用品並說明更換時間（建議 4 小時內）']},
-      {en:'I have cramps', zh:'經痛', ico:'😣'},
-      {en:'I leaked through my clothes', zh:'弄髒衣服了', ico:'👖', act:['提供備用衣物或外套，安排隱密更換空間，衣物裝袋']},
-      {en:'It is my first period', zh:'這是第一次月經', ico:'🌸',
-        act:['以平常心衛教使用方式與週期概念，給予衛生用品','依校規決定是否通知家長；多數學校建議告知']},
-      {en:'I feel dizzy or sick', zh:'覺得頭暈或想吐', ico:'💫', flag:'合併頭暈噁心 — 評估貧血與脫水，測量血壓脈搏'}
+      {en:'I need a pad or tampon', zh:'需要衛生棉／棉條', act:['提供衛生用品並說明更換時間']},
+      {en:'Cramps hurt', zh:'經痛'},
+      {en:'I leaked through my clothes', zh:'弄髒衣服了', act:['提供備用衣物或外套，安排隱密更換空間']},
+      {en:'It is my first period', zh:'這是第一次月經', act:['以平常心衛教使用方式與週期概念，依校規決定是否告知家長']},
+      {en:'I feel dizzy or sick', zh:'覺得頭暈或想吐', flag:'合併頭暈 — 評估貧血與脫水，量血壓脈搏'}
     ]},
-    ...PAIN,
-    {en:'How heavy is the bleeding?', zh:'出血量？', o:[
-      {en:'Normal for me', zh:'跟平常差不多', ico:'🙂'},
-      {en:'Heavier than usual', zh:'比平常多很多', ico:'⚠️', flag:'經血量異常增加 — 建議通知家長安排婦科評估，注意貧血'},
-      {en:'I am not sure', zh:'不確定', ico:'🤔'}
+    PAIN,
+    {en:'How heavy is the bleeding?', zh:'出血量？', multi:false, o:[
+      {en:'Normal for me', zh:'跟平常差不多'},
+      {en:'Heavier than usual', zh:'比平常多', flag:'出血量異常增加 — 建議通知家長安排就醫評估'},
+      {en:'I am not sure', zh:'不確定'}
     ]}
   ],
-  plan:['提供衛生用品與隱密空間，全程維護學生隱私','下腹熱敷，側臥屈膝休息 15–20 分鐘，給予溫熱開水','止痛藥須符合校方 standing order 與家長同意書才可給予','記錄經期資訊供後續追蹤，注意反覆因經痛缺課者'],
-  dispo:'休息後緩解 → 返班。劇痛無法緩解、大量出血或合併頭暈 → 通知家長帶回就醫。',
+  plan:['提供衛生用品與隱密空間，維護學生隱私','腹部熱敷，側臥屈膝休息 15–20 分鐘，給予溫開水','止痛藥須符合校方 standing order 與家長同意書才可給予','記錄經期資訊供後續追蹤'],
+  dispo:'多數休息後可返班。劇痛無法緩解、大量出血或合併頭暈 → 通知家長帶回就醫。',
   say:[{en:'I have pads here. Take what you need.', zh:'這裡有衛生棉，需要就拿。'},
        {en:'You can change in the bathroom over there.', zh:'可以去那邊的廁所更換。'},
-       {en:'Rest here with the heat pack for fifteen minutes.', zh:'用熱敷袋在這裡休息十五分鐘。'}]
+       {en:'Rest here with the heat pack for 15 minutes.', zh:'用熱敷袋在這裡休息 15 分鐘。'}]
 },
 
-{ id:'lens', en:'Glasses or contact lenses', zh:'眼鏡、隱形眼鏡', ico:'👓', tint:'#E4F0EE', ages:['g68','g912'],
-  q:[
-    {en:'What is the problem?', zh:'問題是？', o:[
-      {en:'My contact lens hurts', zh:'隱形眼鏡不舒服', ico:'👁',
-        act:['請學生洗手後自行取下鏡片，護理師不代為操作','以生理食鹽水沖洗眼睛，當日改戴眼鏡']},
-      {en:'I lost a contact lens', zh:'隱形眼鏡掉了', ico:'🔍', act:['檢查是否移位至上眼瞼下方；找不到且有異物感 → 眼科評估']},
-      {en:'My eye is red from my lens', zh:'戴鏡片後眼睛紅', ico:'🔴', flag:'隱形眼鏡相關紅眼 — 疑似角膜感染，停戴並通知家長就醫'},
-      {en:'My glasses broke', zh:'眼鏡壞了', ico:'👓', act:['收好碎片，通知家長；視力受影響時協助調整座位']}
-    ]}
-  ],
-  plan:['評估視力、紅腫、分泌物與畏光程度','取下鏡片後以生理食鹽水沖洗，當日勿再配戴','記錄事件並通知家長'],
-  dispo:'單純不適取下後改善 → 返班。紅眼、畏光、視力模糊或疼痛持續 → 通知家長當日眼科就診。',
-  say:[{en:'Wash your hands first, then take the lens out yourself.', zh:'先洗手，然後自己把鏡片拿下來。'},
-       {en:'Do not put it back in today.', zh:'今天不要再戴回去。'},
-       {en:'Can you see the clock on the wall?', zh:'你看得到牆上的時鐘嗎？'}]
-},
-
-{ id:'feel', en:'I feel upset or worried', zh:'情緒不舒服', ico:'💛', tint:'#F1E9F4',
+{ id:'feel', en:'I feel upset or worried', zh:'情緒不舒服', ico:'😟',
   q:[
     {en:'How are you feeling?', zh:'現在的感覺？', multi:true, o:[
-      {en:'Worried or nervous', zh:'緊張、擔心', ico:'😟'},
-      {en:'Sad', zh:'難過', ico:'😢'},
-      {en:'Angry', zh:'生氣', ico:'😠'},
-      {en:'My heart is racing and I cannot calm down', zh:'心跳很快、靜不下來', ico:'💗',
-        act:['疑似恐慌發作：安靜環境、陪伴、引導 4-7-8 或箱式呼吸，避免過度換氣']},
-      {en:'A problem with a friend', zh:'跟同學有問題', ico:'👥'},
-      {en:'Someone is being mean to me', zh:'有人欺負我', ico:'🚫',
-        flag:'疑似霸凌陳述 — 依校規通報行政與 counselor，記錄學生原話，勿自行調查'},
-      {en:'Something happened at home', zh:'家裡發生事情', ico:'🏠'},
-      {en:'I do not want to say', zh:'不想說', ico:'🤐'}
+      {en:'Worried or nervous', zh:'緊張、擔心'},
+      {en:'Sad', zh:'難過'},
+      {en:'My heart is racing, I cannot calm down', zh:'心跳很快、靜不下來', act:['疑似恐慌發作：引導 4-7-8 呼吸或箱式呼吸，安靜環境陪伴']},
+      {en:'I had a problem with a friend', zh:'跟同學有問題'},
+      {en:'Something happened at home', zh:'家裡發生事情'},
+      {en:'I do not want to say', zh:'不想說'}
     ]},
-    {en:'Do you feel safe right now?', zh:'現在覺得安全嗎？', o:[
-      {en:'Yes', zh:'安全', ico:'✅'},
-      {en:'No — I want to talk to someone', zh:'不安全，想找人談談', ico:'🆘',
-        flag:'學生表達不安全或主動求助 — 立即依校方 crisis protocol 通知 school counselor 與行政主管，全程不可讓學生獨處'}
+    {en:'Do you feel safe right now?', zh:'現在覺得安全嗎？', multi:false, o:[
+      {en:'Yes', zh:'安全'},
+      {en:'No / I want to talk to someone', zh:'不安全，想找人談談', flag:'學生表達不安全或求助 — 立即依校方 crisis protocol 通知 school counselor 與行政主管，全程不可讓學生獨處'}
     ]},
-    ...DUR
+    DUR
   ],
-  plan:['提供安靜、有隱私但仍在視線內的空間，降低刺激並陪伴','引導慢速腹式呼吸，給予溫開水，避免追問細節或評價','評估身體症狀（心悸、換氣過度、發抖）並測量生命徵象','休息 10–15 分鐘後重新評估，紀錄採客觀陳述與學生原話','依校規轉介 school counselor；保健室不作為長時間停留場所'],
-  dispo:'情緒穩定後交由 counselor 接手並返班。表達不安全、無法安撫或涉及霸凌、家庭安全疑慮 → 立即啟動校方 crisis protocol，不可讓學生獨處。',
-  say:[{en:'You are safe here. Take your time.', zh:'你在這裡很安全，慢慢來。'},
+  plan:['提供安靜、有隱私但可視線觀察的空間，陪伴並降低刺激','引導慢速腹式呼吸，給予溫開水，避免追問細節','評估是否有身體症狀（心悸、換氣過度、發抖）並測量生命徵象','休息 10–15 分鐘後重新評估，記錄客觀陳述而非主觀評論','依校方規定轉介 school counselor，並注意保健室非長時間避難場所'],
+  dispo:'情緒穩定後由 counselor 接手並返班。表達不安全、無法安撫或有安全疑慮 → 立即啟動校方 crisis protocol，不可獨處。',
+  say:[{en:'You are safe here. Take your time.', zh:'你在這裡是安全的，慢慢來。'},
        {en:'Breathe in for four, hold, and out for four.', zh:'吸氣四秒，停住，再吐氣四秒。'},
        {en:'Would you like to talk to the counselor?', zh:'要不要跟輔導老師談談？'}]
 },
 
-{ id:'med', en:'My medicine or my condition', zh:'用藥、慢性病', ico:'💊', tint:'#E6EDF9',
+{ id:'med', en:'Medicine / My condition', zh:'用藥、慢性病', ico:'💊',
   q:[
-    {en:'What do you need?', zh:'需要什麼？', o:[
-      {en:'My daily medicine', zh:'要吃固定藥物', ico:'💊',
-        act:['核對 medication authorization form 與家長同意書','執行五對：對人、對藥、對劑量、對時間、對途徑','給藥後簽名記錄於 MAR']},
-      {en:'I need to check my blood sugar', zh:'要測血糖', ico:'🩸',
-        act:['依 diabetes medical management plan 執行並記錄數值']},
-      {en:'I think my blood sugar is low', zh:'覺得血糖低了', ico:'⚠️',
-        flag:'疑似低血糖 — 立即處置，絕不可讓學生單獨移動或自行前往保健室',
-        act:['清醒可吞嚥：給 15 公克速效糖（果汁 120 ml 或葡萄糖片），15 分鐘後複測','仍 < 70 mg/dL：重複一次並通知家長','意識不清或抽搐：不可由口給任何東西，依 plan 給 glucagon 並撥 911']},
-      {en:'I forgot my medicine at home', zh:'藥忘在家裡', ico:'🏠', act:['通知家長，絕不可使用他人藥物替代']},
-      {en:'I need my inhaler / EpiPen', zh:'需要吸入劑或 EpiPen', ico:'💨', act:['取出該生專屬藥物並核對姓名效期']},
-      {en:'Something else', zh:'其他', ico:'❓'}
+    {en:'What do you need?', zh:'需要什麼？', multi:false, o:[
+      {en:'My daily medicine', zh:'要吃我的固定藥物', act:['核對 medication authorization form 與家長同意書','執行三讀五對：對人、對藥、對劑量、對時間、對途徑','給藥後簽名記錄於 MAR']},
+      {en:'I need to check my blood sugar', zh:'要測血糖', act:['依 diabetes medical management plan 執行，記錄數值']},
+      {en:'I feel low blood sugar', zh:'覺得血糖低了', flag:'疑似低血糖 — 立即處置，勿讓學生單獨移動',
+        act:['清醒可吞嚥：給 15 公克速效糖（果汁 120ml 或葡萄糖片），15 分鐘後複測','仍 < 70 mg/dL：重複一次，並通知家長','意識不清或抽搐：勿由口給食物，依 plan 給 glucagon 並打 911']},
+      {en:'I forgot my medicine at home', zh:'藥忘在家裡', act:['通知家長，勿以他人藥物替代']},
+      {en:'Something else', zh:'其他'}
     ]},
     {en:'How do you feel right now?', zh:'現在身體感覺？', multi:true, o:[
-      {en:'Fine, I just need my medicine', zh:'還好，只是要拿藥', ico:'🙂'},
-      {en:'Shaky or sweaty', zh:'發抖、冒冷汗', ico:'💦', flag:'交感神經症狀 — 優先排除低血糖，立即測血糖'},
-      {en:'Very thirsty and going to the bathroom a lot', zh:'一直口渴、一直跑廁所', ico:'🚰', flag:'高血糖警訊 — 依 plan 測血糖與酮體，通知家長'},
-      {en:'Dizzy or confused', zh:'頭暈、恍神', ico:'💫', flag:'意識改變 — 立即測血糖，必要時啟動 EMS'}
+      {en:'Fine, just need my medicine', zh:'還好，只是要拿藥'},
+      {en:'Shaky or sweaty', zh:'發抖、冒冷汗', flag:'交感神經症狀 — 優先排除低血糖'},
+      {en:'Very thirsty / need bathroom a lot', zh:'一直口渴、一直跑廁所', flag:'高血糖警訊 — 依 plan 測血糖與酮體，通知家長'},
+      {en:'Dizzy or confused', zh:'頭暈、恍神', flag:'意識改變 — 立即測血糖，必要時啟動 EMS'}
     ]}
   ],
-  plan:['查閱該生 individualized healthcare plan（IHP）與用藥授權文件','核對藥品名稱、劑量、時間與途徑，執行五對','給藥或處置後記錄於 MAR 並簽名','依情況通知家長與導師，異常數值一律留存紀錄'],
-  dispo:'常規給藥後返班。低血糖、高血糖警訊或意識改變 → 立即處置並通知家長，必要時 911。',
+  plan:['查閱該生 individualized healthcare plan 與用藥授權文件','核對藥品名稱、劑量、時間，執行五對','給藥或處置後記錄於 MAR 並簽名','依情況通知家長與導師'],
+  dispo:'常規給藥後返班。任何低血糖、高血糖警訊或意識改變 → 立即處置並通知家長，必要時 911。',
   say:[{en:'When did you last eat?', zh:'你最後一次吃東西是什麼時候？'},
        {en:'Drink this juice now, all of it.', zh:'現在把這杯果汁全部喝完。'},
        {en:'Stay here with me. Do not walk back alone.', zh:'留在這裡，不要自己走回去。'}]
 },
 
-{ id:'sub', en:'I took something and feel bad', zh:'服用／吸入物質後不適', ico:'⚠️', tint:'#FDE8E4', ages:['g68','g912'],
+{ id:'rest', en:'I just need to rest / ice', zh:'只是想休息、冰敷', ico:'🧊',
   q:[
-    {en:'What is going on?', zh:'情況是？', multi:true, o:[
-      {en:'I feel bad after taking something', zh:'吃了東西後不舒服', ico:'😵',
-        flag:'疑似物質相關不適 — 以醫療安全為優先，依校規通知行政主管與家長，勿現場質問或搜身'},
-      {en:'I vaped or smoked', zh:'有使用電子煙或抽菸', ico:'💨',
-        act:['評估呼吸、胸痛、心悸；電子煙相關肺損傷（EVALI）需就醫評估','依校規通報行政，紀錄客觀陳述']},
-      {en:'I took too much of my medicine', zh:'吃了過多自己的藥', ico:'💊',
-        flag:'⚠ 藥物過量 — 立即撥 911 與毒物中心，取得藥名劑量時間，全程留置陪同'},
-      {en:'Someone gave me something', zh:'別人給我東西吃', ico:'🚨',
-        flag:'⚠ 來源不明物質 — 立即撥 911，通知行政與家長，保留包裝'},
-      {en:'I do not want to say what it was', zh:'不想說是什麼', ico:'🤐',
-        act:['不強迫說明，聚焦生理評估；明確告知保密限制與安全優先']}
+    {en:'What do you need?', zh:'需要什麼？', multi:false, o:[
+      {en:'An ice pack', zh:'冰敷袋'},
+      {en:'Rest for a few minutes', zh:'休息一下'},
+      {en:'A drink of water', zh:'喝水'},
+      {en:'A bandage', zh:'OK 繃'},
+      {en:'I do not feel good but I do not know why', zh:'說不出來就是不舒服', flag:'主訴不明確 — 需完整生命徵象評估，並注意潛在情緒或家庭因素'}
     ]},
-    {en:'How do you feel?', zh:'身體感覺？', multi:true, o:[
-      {en:'Heart racing', zh:'心跳很快', ico:'💗', flag:'心悸 — 測量脈搏血壓，必要時 EMS'},
-      {en:'Hard to breathe', zh:'呼吸困難', ico:'🚨', flag:'⚠ 呼吸窘迫 — 立即撥 911'},
-      {en:'Very sleepy', zh:'非常想睡', ico:'😴', flag:'⚠ 意識抑制 — 立即撥 911，維持呼吸道，側臥擺位，絕不可讓學生獨處'},
-      {en:'Throwing up', zh:'一直吐', ico:'🤮', flag:'嘔吐合併意識改變 — 側臥防吸入，啟動 EMS'},
-      {en:'Dizzy or shaky', zh:'頭暈、發抖', ico:'💫'}
-    ]}
+    DUR
   ],
-  plan:['以醫療處置為第一優先，全程陪同不可讓學生單獨離開','測量生命徵象（含血氧、脈搏、血壓、體溫）並每 10 分鐘重複','盡量取得物質名稱、劑量與時間；保留包裝或容器交給救護人員','依校規立即通知行政主管與家長；美國可撥 Poison Control 1-800-222-1222','紀錄僅寫客觀觀察與學生原話，不作推論或評論'],
-  dispo:'任何意識改變、呼吸抑制、心悸或不明物質 → 立即 911 送醫。其餘依校方藥物政策由行政與家長共同處理。',
-  say:[{en:'You are not in trouble with me. I need to keep you safe.', zh:'我不是要罵你，我要確保你安全。'},
-       {en:'What did you take, and how much?', zh:'你吃了什麼？吃了多少？'},
-       {en:'Stay awake and look at me. Help is coming.', zh:'保持清醒看著我，救護人員在路上了。'}]
-},
-
-{ id:'private', en:'I need to talk privately', zh:'我想私下談', ico:'🤝', tint:'#E4F0EE', ages:['g68','g912'],
-  q:[
-    {en:'Is this an emergency right now?', zh:'現在是緊急狀況嗎？', o:[
-      {en:'No, I just need to talk', zh:'不是，只是想談談', ico:'💬'},
-      {en:'Yes, I need help now', zh:'是，現在就需要幫忙', ico:'🆘',
-        flag:'學生主動求助且表達緊急 — 立即啟動校方 crisis protocol，通知 counselor 與行政主管，不可讓學生獨處'}
-    ]},
-    {en:'Would you like a female staff member?', zh:'需要女性人員陪同嗎？', o:[
-      {en:'Yes', zh:'需要', ico:'👩'},
-      {en:'No', zh:'不用', ico:'🙂'},
-      {en:'I want the counselor', zh:'想找輔導老師', ico:'🧑‍🏫', act:['直接聯繫 school counselor 並陪同至輔導室']}
-    ]}
-  ],
-  plan:['提供安靜隱密空間，僅記錄學生主動陳述的內容與原話','先說明保密限制：涉及自身或他人安全時必須通報，讓學生知情','不追問細節、不承諾絕對保密、不自行調查','依校規轉介 school counselor 或 social worker，並通知行政主管','任何涉及虐待、傷害或安全疑慮 → 依當地 mandated reporter 規定通報'],
-  dispo:'非緊急 → 轉介 counselor 後返班。涉及安全疑慮 → 啟動 crisis protocol，全程陪同不可獨處。',
-  say:[{en:'We can talk here. No one else will come in.', zh:'我們可以在這裡談，不會有別人進來。'},
-       {en:'I keep things private, unless someone could get hurt.', zh:'我會保密，除非有人可能受到傷害。'},
-       {en:'I am going to bring someone who can help you.', zh:'我去請一位可以幫你的人過來。'}]
-},
-
-{ id:'rest', en:'I just need a rest or an ice pack', zh:'休息、冰敷、小需求', ico:'🧊', tint:'#E4F0EE',
-  q:[
-    {en:'What do you need?', zh:'需要什麼？', o:[
-      {en:'An ice pack', zh:'冰敷袋', ico:'🧊'},
-      {en:'A bandage', zh:'OK 繃', ico:'🩹'},
-      {en:'A drink of water', zh:'喝水', ico:'💧'},
-      {en:'To rest for a few minutes', zh:'休息一下', ico:'🛏'},
-      {en:'To call home', zh:'打電話回家', ico:'📞', act:['依校規決定是否可致電；先評估有無實際身體不適']},
-      {en:'I do not feel good but I do not know why', zh:'說不上來就是不舒服', ico:'😔',
-        flag:'主訴不明確 — 完整生命徵象評估，並留意潛在情緒、家庭或校園適應問題'}
-    ]},
-    ...DUR
-  ],
-  plan:['測量體溫與脈搏，排除發燒或明確病症','提供所需物品，休息時間依校規（通常 15–20 分鐘）','記錄到訪與離開時間；留意同週反覆到訪的頻繁就診學生','反覆到訪 → 通知導師與家長，評估潛在身體或情緒問題'],
-  dispo:'休息後返班並開立返班通行條。同一週多次到訪 → 通報導師與家長評估。',
-  say:[{en:'You can rest here for fifteen minutes.', zh:'你可以在這裡休息十五分鐘。'},
+  plan:['測量體溫與脈搏，排除發燒或明確病症','提供所需物品，休息上限依校規（通常 15–20 分鐘）','記錄到訪時間與離開時間，留意反覆到訪的頻繁就診學生'],
+  dispo:'休息後返班。同一週反覆到訪 → 通知導師與家長，評估是否有潛在身體或情緒問題。',
+  say:[{en:'You can rest here for 15 minutes.', zh:'你可以在這裡休息 15 分鐘。'},
        {en:'I will write you a pass back to class.', zh:'我會寫一張回教室的通行條給你。'},
-       {en:'Come back if you feel worse.', zh:'如果變不舒服就再回來。'}]
+       {en:'Come back if it gets worse.', zh:'如果變嚴重就再回來。'}]
 }
 ];
 
-/* =======================================================================
-   家長電話腳本
-   ======================================================================= */
-const CALLS = {
-  fyi:{ label:'僅告知（學生留校）', tint:'var(--teal-l)', lines:[
-    ['Hello, this is the health office at school. May I speak with [NAME]\'s parent?','您好，這裡是學校保健室，請問是 [NAME] 的家長嗎？'],
-    ['[NAME] came to the health office today at [TIME].','[NAME] 今天 [TIME] 來保健室。'],
-    ['The reason was: [COMPLAINT].','原因是：[COMPLAINT]。'],
-    ['We checked, gave first aid, and [NAME] felt better.','我們評估並做了初步處理，現在好多了。'],
-    ['[NAME] has gone back to class. I just wanted you to know.','已經回教室上課了，先讓您知道一下。'],
-    ['Please watch at home tonight, and call the school if anything changes.','今晚在家請多留意，有變化請跟學校聯絡。'],
-    ['Thank you. Have a good day.','謝謝您，再見。']
-  ]},
-  pick:{ label:'請家長來接回家', tint:'var(--amber-l)', lines:[
-    ['Hello, this is the health office at school. May I speak with [NAME]\'s parent?','您好，這裡是學校保健室，請問是 [NAME] 的家長嗎？'],
-    ['[NAME] is in the health office right now. It is not an emergency.','[NAME] 現在在保健室，不是緊急狀況。'],
-    ['[NAME] has [COMPLAINT], and the temperature is [TEMP].','[NAME] 有 [COMPLAINT]，體溫是 [TEMP]。'],
-    ['Our school policy is that [NAME] needs to go home.','依學校規定，[NAME] 需要回家休息。'],
-    ['Can you come and pick [NAME] up? About what time can you be here?','您方便來接嗎？大約幾點會到？'],
-    ['[NAME] will wait in the health office. Please come to the front office first.','[NAME] 會在保健室等，請先到學校辦公室。'],
-    ['Please bring your ID for sign-out. Thank you very much.','簽名帶回時請帶證件，謝謝您。']
-  ]},
-  doc:{ label:'建議就醫', tint:'var(--amber-l)', lines:[
-    ['Hello, this is the school health office calling about [NAME].','您好，這裡是學校保健室，是關於 [NAME] 的事。'],
-    ['[NAME] has [COMPLAINT]. I would like you to come now.','[NAME] 有 [COMPLAINT]，希望您現在過來。'],
-    ['I recommend that [NAME] sees a doctor today.','我建議 [NAME] 今天看醫生。'],
-    ['Please take [NAME] to the clinic or emergency room after pick-up.','接走之後請帶去診所或急診。'],
-    ['I will send my notes with [NAME]. Please show them to the doctor.','我會把紀錄交給您，請拿給醫生看。'],
-    ['Please call the school and let us know how it goes.','之後請跟學校說一下狀況，謝謝。']
-  ]},
-  ems:{ label:'已叫救護車', tint:'var(--alert-l)', lines:[
-    ['This is the school health office. I need to speak with [NAME]\'s parent right now.','這裡是學校保健室，我現在需要跟 [NAME] 的家長說話。'],
-    ['[NAME] is safe, and we are with [NAME] the whole time.','[NAME] 有人全程陪著，請放心。'],
-    ['[NAME] has [COMPLAINT]. We have called 911.','[NAME] 有 [COMPLAINT]，我們已經叫了救護車。'],
-    ['The ambulance is taking [NAME] to the hospital.','救護車會送 [NAME] 去醫院。'],
-    ['Please meet us at the hospital, or come to the school now.','請直接到醫院，或現在來學校。'],
-    ['A staff member will stay with [NAME] until you arrive.','會有老師陪著 [NAME] 到您抵達。']
-  ]}
-};
-const REPLIES = [
-  ['I am on my way.','我在路上了。','Thank you. Please come to the front office.｜謝謝，請到學校辦公室。'],
-  ['I cannot leave work right now.','我現在無法離開工作。','Is there another adult on the emergency card who can come?｜緊急聯絡人中有其他大人可以來嗎？'],
-  ['Can he/she stay until the end of the day?','可以讓他待到放學嗎？','I am sorry, our policy is that he/she needs to go home.｜抱歉，依規定需要回家。'],
-  ['How is he/she now?','他現在怎麼樣？','Resting in the health office, awake and talking.｜在保健室休息，意識清楚可以說話。'],
-  ['Did you give any medicine?','有給藥嗎？','No medicine without your written permission.｜沒有您的書面同意我們不會給藥。'],
-  ['Sorry, can you repeat that?','可以再說一次嗎？','Of course. Let me say it again slowly.｜當然，我慢慢再說一次。'],
-  ['Who is this again?','請問您是哪位？','This is the school nurse. I am covering the health office today.｜我是學校護理師，今天代班保健室。']
-];
-
-/* =======================================================================
-   英文速查
-   ======================================================================= */
+/* ---------- 常用英文速查 ---------- */
 const PHRASES = [
   ['Hello, what is your name and grade?','你好，你叫什麼名字？幾年級？'],
   ['What is wrong? Show me where.','怎麼了？指給我看哪裡。'],
   ['Point to where it hurts.','指出痛的地方。'],
   ['When did it start?','什麼時候開始的？'],
-  ['Show me on the screen. Tap the picture.','在螢幕上點給我看。'],
+  ['On a scale of 1 to 10, how bad is it?','1 到 10 分，有多痛？'],
   ['Did you eat breakfast today?','今天有吃早餐嗎？'],
   ['Do you have any allergies?','你有過敏嗎？'],
   ['Do you take any medicine?','你有在吃什麼藥嗎？'],
@@ -888,437 +532,298 @@ const PHRASES = [
   ['Please sit here and rest.','請坐在這裡休息。'],
   ['I will put ice on it.','我幫你冰敷。'],
   ['This may sting a little.','可能會有一點刺痛。'],
-  ['You are doing great. Almost done.','你做得很好，快好了。'],
+  ['You are doing great.','你做得很好。'],
   ['I am going to call your parents.','我要打電話給你的家長。'],
   ['You can go back to class now.','你現在可以回教室了。'],
   ['Come back if you feel worse.','如果變不舒服就再回來。'],
   ['Please wait here. Do not leave.','請在這裡等，不要離開。'],
-  ['Take a deep breath with me.','跟我一起深呼吸。'],
+  ['Can you take a deep breath for me?','可以深呼吸一下給我看嗎？'],
   ['Do you feel dizzy when you stand up?','站起來會頭暈嗎？'],
-  ['Does your teacher know you are here?','老師知道你來這裡嗎？'],
-  ['Sorry, my English is not perfect. Can you say it slowly?','抱歉我的英文沒有很好，可以說慢一點嗎？'],
-  ['Let me write it down for you.','我寫下來給你。'],
-  ['Who can I call for you?','我可以打電話給誰？'],
-  ['Is there a teacher who can help us?','有沒有老師可以幫我們？']
+  ['Is your teacher expecting you back?','老師知道你要回去嗎？']
 ];
 
-/* =======================================================================
+/* =========================================================
    狀態與流程
-   ======================================================================= */
-let S = {view:'age', age:'g35', cat:null, step:0, picks:[], sel:[], timer:null, tLeft:0, call:'pick'};
+   ========================================================= */
+let S = {view:'home', cat:null, step:0, picks:[], sel:[], timer:null, tLeft:0};
 const app = document.getElementById('app');
-const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const q2 = s => String(s==null?'':s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-function go(v){ S.view=v; draw(); scrollTo(0,0); }
-function setAge(id){
-  S.age = id;
-  const a = AGES.find(x=>x.id===id);
-  document.getElementById('ageBtn').textContent = a.ico + ' ' + a.zh;
-  go('home');
-}
-function cats(){ return DATA.filter(okAge); }
-function qs(){ return S.cat.q.filter(okAge); }
-function qText(q){ return q.en; }
+function go(v){ S.view=v; draw(); window.scrollTo(0,0); }
 
-function startCat(id){
-  S.cat = DATA.find(c=>c.id===id); S.step=0; S.picks=[]; S.sel=[];
-  S.view='q'; draw(); scrollTo(0,0);
-  autoSay(qText(qs()[0]));
+function startCat(i){
+  S.cat = DATA[i]; S.step = 0; S.picks = []; S.sel = [];
+  S.view = 'q'; draw(); window.scrollTo(0,0);
 }
 function toggle(i){
-  const q = qs()[S.step], o = q.o.filter(okAge)[i];
-  if(TTS.on) say(o.en,'en-US');
+  const q = S.cat.q[S.step];
   if(q.multi){
-    const k = S.sel.indexOf(i); if(k>=0) S.sel.splice(k,1); else S.sel.push(i);
+    const k = S.sel.indexOf(i);
+    if(k>=0) S.sel.splice(k,1); else S.sel.push(i);
     draw();
-  } else { S.sel=[i]; setTimeout(next, TTS.on?450:0); }
+  } else {
+    S.sel = [i]; next();
+  }
 }
 function next(){
-  const q = qs()[S.step];
-  S.picks[S.step] = {q, o:q.o.filter(okAge), sel:S.sel.slice()};
+  const q = S.cat.q[S.step];
+  S.picks[S.step] = {q, sel:S.sel.slice()};
   S.sel = [];
-  if(S.step < qs().length-1){ S.step++; S.view='q'; draw(); scrollTo(0,0); autoSay(qText(qs()[S.step])); }
-  else { S.view='result'; try{speechSynthesis.cancel()}catch(e){} draw(); scrollTo(0,0); }
+  if(S.step < S.cat.q.length-1){ S.step++; S.view='q'; }
+  else { S.view='result'; }
+  draw(); window.scrollTo(0,0);
 }
 function back(){
-  if(S.step>0){ S.step--; S.sel=(S.picks[S.step]||{sel:[]}).sel.slice(); S.view='q'; }
+  if(S.step > 0){ S.step--; S.sel = (S.picks[S.step]||{sel:[]}).sel.slice(); S.view='q'; }
   else { S.view='home'; S.cat=null; }
-  draw(); scrollTo(0,0);
+  draw(); window.scrollTo(0,0);
 }
 
-/* =======================================================================
+/* =========================================================
    畫面
-   ======================================================================= */
+   ========================================================= */
 function draw(){
-  const f = {age:drawAge, home:drawHome, q:drawQ, result:drawResult, call:drawCall,
-             pass:drawPass, log:drawLog, phrases:drawPhrases, sos:drawSOS}[S.view];
-  (f||drawHome)();
-}
-
-function drawAge(){
-  app.innerHTML = `
-    <h1 class="h1">Who is here today?</h1>
-    <p class="sub">先選學生的年齡層 — 題目難度、疼痛量表與可選項目會自動調整。</p>
-    <div class="grid k">
-      ${AGES.map(a=>`
-        <button class="tile" onclick="setAge('${a.id}')">
-          <span class="disc" style="background:${a.id===S.age?'var(--teal-l)':'#F1F6F5'}">${a.ico}</span>
-          <span class="tx"><span class="en">${esc(a.en)}</span><span class="zh">${esc(a.zh)}　·　${esc(a.note)}</span></span>
-        </button>`).join('')}
-    </div>
-    <p class="hint" style="margin-top:22px">🔊 朗讀開啟時，題目會自動用英文唸出來，低年級學生看不懂字也能操作。iPad 第一次使用請先點任一按鈕以啟用發音。</p>`;
+  if(S.view==='home') return drawHome();
+  if(S.view==='q') return drawQ();
+  if(S.view==='result') return drawResult();
+  if(S.view==='log') return drawLog();
+  if(S.view==='phrases') return drawPhrases();
+  if(S.view==='sos') return drawSOS();
 }
 
 function drawHome(){
-  const kid = S.age==='k2';
   app.innerHTML = `
-    <h1 class="h1 ${kid?'kid':''}">${kid?'What hurts today?':'What can I help you with today?'}</h1>
-    <p class="sub">今天哪裡不舒服？請按下最接近的一項。</p>
-    <div class="grid ${kid?'k':''}">
-      ${cats().map(c=>`
-        <button class="tile" onclick="startCat('${c.id}')">
-          <span class="disc" style="background:${c.tint}">${c.ico}</span>
+    <h1 class="ask">Hi! What is wrong today?</h1>
+    <p class="ask-zh">你好，今天哪裡不舒服？請按下最接近的一項。</p>
+    <div class="grid">
+      ${DATA.map((c,i)=>`
+        <button class="pick" onclick="startCat(${i})">
+          <span class="ico">${c.ico}</span>
           <span class="tx"><span class="en">${esc(c.en)}</span><span class="zh">${esc(c.zh)}</span></span>
         </button>`).join('')}
     </div>
-    <p class="hint" style="margin-top:24px">護理師：學生點選完成後會輸出中文主訴摘要、紅旗警示與處置建議，並可產生家長電話腳本與返班通行條。</p>`;
+    <p class="hint" style="margin-top:22px">護理師提示：學生點選完成後，畫面會輸出中文主訴摘要、建議處置與紅旗警示，並可存成就診紀錄。</p>`;
+}
+
+function trailHTML(){
+  const out = [];
+  S.picks.forEach(p=>{ if(!p) return;
+    p.sel.forEach(i=> out.push(`<span class="chip">${esc(p.q.o[i].en)}<b>${esc(p.q.o[i].zh)}</b></span>`));
+  });
+  return out.length ? `<div class="trail">${out.join('')}</div>` : '';
 }
 
 function drawQ(){
-  const list = qs(), q = list[S.step], opts = q.o.filter(okAge), kid = S.age==='k2';
-  const trail = [];
-  S.picks.forEach(p=>{ if(p) p.sel.forEach(i=>trail.push(`<span class="chip">${esc(p.o[i].en)}<b>${esc(p.o[i].zh)}</b></span>`)); });
+  const q = S.cat.q[S.step];
   app.innerHTML = `
-    <div class="bars">${list.map((_,i)=>`<i class="${i<=S.step?'done':''}"></i>`).join('')}</div>
-    ${trail.length?`<div class="trail">${trail.join('')}</div>`:''}
-    <div style="display:flex;align-items:flex-start;gap:12px">
-      <div style="flex:1">
-        <h1 class="h1 ${kid?'kid':''}">${esc(qText(q))}</h1>
-        <p class="sub">${esc(q.zh)}${q.multi?'　｜　可以選很多項 tap all that apply':''}</p>
-      </div>
-      <button class="spk" style="margin-top:10px" onclick="say('${q2(qText(q))}','en-US')">🔊</button>
-    </div>
-    <div class="grid ${kid?'k':'w'}">
-      ${opts.map((o,i)=>`
-        <button class="opt ${S.sel.includes(i)?'on':''}" onclick="toggle(${i})">
-          ${o.ico?`<span class="face">${o.ico}</span>`:''}
+    ${trailHTML()}
+    <h1 class="ask">${esc(q.en)}</h1>
+    <p class="ask-zh">${esc(q.zh)}${q.multi?' ｜ 可以選很多項 tap all that apply':''}</p>
+    <div class="grid wide">
+      ${q.o.map((o,i)=>`
+        <button class="pick ${S.sel.includes(i)?'on':''}" onclick="toggle(${i})">
           <span class="tx"><span class="en">${esc(o.en)}</span><span class="zh">${esc(o.zh)}</span></span>
           <span class="tick">✓</span>
         </button>`).join('')}
     </div>
     <div class="nav">
       <button class="btn" onclick="back()">← Back 上一步</button>
-      <span class="sp"></span>
-      <span class="hint">${S.step+1} / ${list.length}</span>
-      ${q.multi?`<button class="btn go" onclick="next()" ${S.sel.length?'':'disabled'}>Next 下一步 →</button>`:''}
+      <span class="spacer"></span>
+      <span class="hint" style="margin:0">${S.step+1} / ${S.cat.q.length}</span>
+      ${q.multi ? `<button class="btn go" onclick="next()" ${S.sel.length?'':'disabled'}>Next 下一步 →</button>` : ''}
     </div>`;
 }
 
+/* 彙整選擇 → 摘要、紅旗、追加處置 */
 function digest(){
-  const zh=[], en=[], flags=[], acts=[];
+  const zh = [], en = [], flags = [], acts = [];
   S.picks.forEach(p=>{ if(!p) return;
-    const zs=p.sel.map(i=>p.o[i].zh), es=p.sel.map(i=>p.o[i].en);
-    if(zs.length) zh.push(p.q.zh.replace(/[？?].*$/,'')+'：'+zs.join('、'));
+    const zs = p.sel.map(i=>p.q.o[i].zh), es = p.sel.map(i=>p.q.o[i].en);
+    if(zs.length) zh.push(p.q.zh.replace(/？.*$/,'') + '：' + zs.join('、'));
     if(es.length) en.push(es.join(', '));
-    p.sel.forEach(i=>{ const o=p.o[i]; if(o.flag) flags.push(o.flag); if(o.act) o.act.forEach(a=>acts.push(a)); });
+    p.sel.forEach(i=>{
+      const o = p.q.o[i];
+      if(o.flag) flags.push(o.flag);
+      if(o.act) o.act.forEach(a=>acts.push(a));
+    });
   });
-  return {zh,en,flags,acts};
+  return {zh, en, flags, acts};
 }
-const V = id => (document.getElementById(id)||{value:''}).value.trim();
-const NAME = () => V('sName') || 'the student';
 
 function drawResult(){
-  const c=S.cat, d=digest(), now=new Date();
+  const c = S.cat, d = digest();
+  const name = document.getElementById('sName').value.trim();
+  const grade = document.getElementById('sGrade').value.trim();
+  const t = new Date();
   app.innerHTML = `
     <div class="cols">
       <div>
         <div class="card">
-          <h3>主訴摘要　CHIEF COMPLAINT</h3>
-          <div class="sum">${esc(c.zh)}${V('sName')?`　—　${esc(V('sName'))}`:''}${V('sGrade')?`（${esc(V('sGrade'))}）`:''}
-            <span class="q">${esc(d.zh.join('｜'))}</span>
-            <span class="q" style="color:var(--ink3)">學生原始選擇：${esc(d.en.join(' / '))}</span>
+          <h3>主訴摘要 CHIEF COMPLAINT</h3>
+          <div class="sum">${esc(c.zh)}${name?`　—　${esc(name)}`:''}${grade?`（${esc(grade)}）`:''}
+            <span class="q">${d.zh.map(esc).join('｜')}</span>
+            <span class="q" style="color:#8FA5A3">學生原始選擇：${d.en.map(esc).join(' / ')}</span>
           </div>
         </div>
 
-        ${d.flags.length?`<div class="card" style="border-color:#EEC4BE;padding:0">
-          <div class="flag" style="border-radius:16px">
-            <h4>紅旗警示　RED FLAGS — 先處理這些</h4>
+        ${d.flags.length ? `<div class="card" style="border-color:#EEBFB9">
+          <div class="flagbox" style="margin:0">
+            <h4>紅旗警示 RED FLAGS — 請先處理</h4>
             <ul>${d.flags.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>
-          </div></div>`:''}
+          </div></div>` : ''}
 
         <div class="card">
-          <h3>建議處置　NURSING ACTIONS</h3>
+          <h3>建議處置 NURSING ACTIONS</h3>
           <ol class="steps">
             ${c.plan.map(s=>`<li>${esc(s)}</li>`).join('')}
-            ${d.acts.map(s=>`<li class="add">${esc(s)}</li>`).join('')}
+            ${d.acts.map(s=>`<li><strong>${esc(s)}</strong></li>`).join('')}
           </ol>
           <div class="dispo"><b>去向建議：</b>${esc(c.dispo)}</div>
         </div>
 
         <div class="card noprint">
-          <h3>護理紀錄　DOCUMENTATION</h3>
-          <div class="vitals">
+          <h3>護理紀錄 DOCUMENTATION</h3>
+          <div class="note-grid">
             <div><label>體溫 Temp</label><input id="vTemp" inputmode="decimal" placeholder="°F / °C"></div>
             <div><label>脈搏 HR</label><input id="vHr" inputmode="numeric" placeholder="bpm"></div>
             <div><label>血壓 BP</label><input id="vBp" placeholder="120/80"></div>
-            <div><label>血氧 SpO₂</label><input id="vSpo" inputmode="numeric" placeholder="%"></div>
             <div><label>疼痛 Pain</label><input id="vPain" inputmode="numeric" placeholder="0–10"></div>
           </div>
-          <textarea id="vNote" placeholder="處置內容、通知家長時間與對象、去向（返班 / 家長帶回 / 送醫）"></textarea>
+          <textarea id="vNote" placeholder="處置內容、通知家長時間、去向（返班 / 家長帶回 / 送醫）"></textarea>
           <div class="timer">
             <span class="clock" id="clock">15:00</span>
-            <button class="sm" onclick="startTimer(15)">15 分觀察</button>
-            <button class="sm" onclick="startTimer(10)">10 分止血</button>
-            <button class="sm" onclick="startTimer(5)">5 分冰敷</button>
-            <button class="sm" onclick="stopTimer()">停止</button>
+            <button class="small" onclick="startTimer(15)">15 分觀察</button>
+            <button class="small" onclick="startTimer(10)">10 分止血</button>
+            <button class="small" onclick="stopTimer()">停止</button>
           </div>
         </div>
       </div>
 
       <div>
         <div class="card">
-          <h3>對學生說　SAY TO THE STUDENT</h3>
-          ${c.say.map(s=>`<div class="say"><div class="t"><div class="e">${esc(s.en)}</div><div class="c">${esc(s.zh)}</div></div>
-            <button class="spk noprint" onclick="say('${q2(s.en)}','en-US')">🔊</button></div>`).join('')}
+          <h3>對學生說 SAY TO THE STUDENT</h3>
+          ${c.say.map(s=>`<div class="say"><div class="e">${esc(s.en)}</div><div class="c">${esc(s.zh)}</div></div>`).join('')}
         </div>
         <div class="card noprint">
           <h3>下一步</h3>
-          <div class="stack">
-            <button class="btn go" onclick="go('call')">📞 家長電話腳本</button>
-            <button class="btn" onclick="go('pass')">🎫 列印通行條</button>
-            <button class="btn" onclick="saveRec()">💾 儲存就診紀錄</button>
-            <button class="btn" onclick="window.print()">🖨 列印這一頁</button>
-            <button class="btn" onclick="go('home')">↩︎ 回主畫面 New student</button>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn go" onclick="saveRec()">儲存這筆就診紀錄</button>
+            <button class="btn" onclick="window.print()">列印／存成 PDF</button>
+            <button class="btn" onclick="go('home')">回到主畫面 New student</button>
           </div>
-          <p class="hint" style="margin:14px 0 0">${now.toLocaleString('zh-TW')}</p>
+          <p class="hint" style="margin:14px 0 0">紀錄時間 ${t.toLocaleString('zh-TW')}</p>
         </div>
       </div>
     </div>
     <div class="nav noprint"><button class="btn" onclick="back()">← 修改上一題</button></div>`;
 }
 
-/* ---------- 家長電話腳本 ---------- */
-function fill(t){
-  const d = digest();
-  return t.replace(/\[NAME\]/g, NAME())
-          .replace(/\[TIME\]/g, new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}))
-          .replace(/\[COMPLAINT\]/g, S.cat ? (S.cat.en.toLowerCase()+(d.en[0]?' — '+d.en[0].toLowerCase():'')) : 'a health problem')
-          .replace(/\[TEMP\]/g, V('vTemp')||'normal');
-}
-function fillZh(t){
-  const d = digest();
-  return t.replace(/\[NAME\]/g, V('sName')||'學生')
-          .replace(/\[TIME\]/g, new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}))
-          .replace(/\[COMPLAINT\]/g, S.cat?S.cat.zh:'身體不適')
-          .replace(/\[TEMP\]/g, V('vTemp')||'正常');
-}
-function setCall(k){ S.call=k; drawCall(); }
-function drawCall(){
-  const c = CALLS[S.call];
-  app.innerHTML = `
-    <h1 class="h1">Calling the parents</h1>
-    <p class="sub">照著唸就好，每一句都可以按 🔊 先聽一次發音。空白處已自動帶入學生姓名與主訴。</p>
-    <div class="tabs">
-      ${Object.keys(CALLS).map(k=>`<button class="tab ${k===S.call?'on':''}" onclick="setCall('${k}')">${CALLS[k].label}</button>`).join('')}
-    </div>
-    <div class="cols">
-      <div>
-        <div class="card" style="background:${c.tint}">
-          <h3>電話腳本　PHONE SCRIPT</h3>
-          ${c.lines.map(l=>{const e=fill(l[0]);return `
-            <div class="say" style="background:#fff"><div class="t">
-              <div class="e">${esc(e)}</div><div class="c">${esc(fillZh(l[1]))}</div></div>
-              <button class="spk noprint" onclick="say('${q2(e)}','en-US')">🔊</button></div>`;}).join('')}
-          <button class="btn noprint" style="margin-top:6px" onclick="sayAll()">▶︎ 整段連續朗讀</button>
-        </div>
-      </div>
-      <div>
-        <div class="card">
-          <h3>家長可能會這樣回　IF THEY SAY…</h3>
-          ${REPLIES.map(r=>`<div style="padding:12px 0;border-bottom:1px solid var(--line2)">
-            <div style="font-size:17px;font-weight:600">${esc(r[0])}</div>
-            <div class="hint">${esc(r[1])}</div>
-            <div style="margin-top:7px;font-size:16px;color:var(--teal-d)">↳ ${esc(r[2].split('｜')[0])}</div>
-            <div class="hint">${esc(r[2].split('｜')[1]||'')}</div>
-          </div>`).join('')}
-        </div>
-        <div class="card noprint">
-          <div class="stack">
-            <button class="btn" onclick="window.print()">🖨 列印腳本</button>
-            <button class="btn go" onclick="go('result')">← 回處置畫面</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-function sayAll(){
-  const c = CALLS[S.call];
-  try{ speechSynthesis.cancel(); }catch(e){}
-  unlockTTS();
-  c.lines.forEach(l=>{
-    const u = new SpeechSynthesisUtterance(fill(l[0]));
-    u.lang='en-US'; u.rate=.85; const v=pickVoice('en-US'); if(v) u.voice=v;
-    try{ speechSynthesis.speak(u); }catch(e){}
-  });
-}
-
-/* ---------- 返班／帶回通行條 ---------- */
-function drawPass(){
-  const d = digest(), t = new Date();
-  const nm = V('sName')||'____________', gr = V('sGrade')||'______';
-  const en = S.cat ? S.cat.en : '';
-  const box = (title, extra) => `
-    <div class="pass">
-      <h4>${title}</h4>
-      <div class="hint" style="margin-bottom:8px">School Health Office · 保健室</div>
-      <div class="row"><span>Student 姓名</span><span>${esc(nm)}</span></div>
-      <div class="row"><span>Grade 年級</span><span>${esc(gr)}</span></div>
-      <div class="row"><span>Date / Time</span><span>${t.toLocaleDateString()} ${t.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span></div>
-      <div class="row"><span>Seen for</span><span>${esc(en)}</span></div>
-      <div class="row"><span>Care given</span><span>${esc(V('vNote')||'First aid and rest in the health office')}</span></div>
-      ${extra}
-      <div class="row" style="border:none;margin-top:10px"><span>Nurse 簽名</span><span>______________________</span></div>
-    </div>`;
-  app.innerHTML = `
-    <h1 class="h1">Passes &amp; slips</h1>
-    <p class="sub">選一張列印或存成 PDF 給學生帶走。列印時只會印出通行條，不會印出整個畫面。</p>
-    <div class="nav noprint" style="margin-top:0">
-      <button class="btn go" onclick="printPass()">🖨 列印下方通行條</button>
-      <button class="btn" onclick="go('result')">← 回處置畫面</button>
-    </div>
-    <div class="card" id="passSrc">
-      ${box('RETURN TO CLASS PASS　返班通行條',
-        `<div class="row"><span>Return time</span><span>${t.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span></div>
-         <div class="row"><span>Note to teacher</span><span>Student may return to class. Please send back if symptoms return.</span></div>`)}
-      ${box('GOING HOME / SIGN-OUT SLIP　家長帶回單',
-        `<div class="row"><span>Parent called</span><span>________  at  ________</span></div>
-         <div class="row"><span>Picked up by</span><span>______________________</span></div>
-         <div class="row"><span>Return to school</span><span>Fever-free 24 hours without medicine 退燒滿 24 小時方可返校</span></div>`)}
-      ${box('HEAD INJURY / INCIDENT NOTICE　頭部外傷通知單',
-        `<div class="row"><span>What happened</span><span>${esc(d.en.join('; ')||'________________')}</span></div>
-         <div class="row"><span>Watch for</span><span>Vomiting, worse headache, confusion, unequal pupils, seizure → go to ER</span></div>
-         <div class="row"><span>中文提醒</span><span>返家 24–48 小時觀察：嘔吐、頭痛加劇、意識混亂、瞳孔不等大、抽搐 → 立即急診</span></div>`)}
-    </div>`;
-}
-function printPass(){
-  const src = document.getElementById('passSrc');
-  const area = document.getElementById('passArea');
-  area.innerHTML = src.innerHTML; area.classList.add('only');
-  const hide = document.querySelector('.wrap'); hide.style.display='none';
-  window.print();
-  setTimeout(()=>{ hide.style.display=''; area.innerHTML=''; area.classList.remove('only'); }, 600);
-}
-
-/* ---------- 計時器 ---------- */
+/* ---------- 觀察計時器 ---------- */
 function startTimer(min){
   stopTimer(); S.tLeft = min*60;
+  const el = ()=>document.getElementById('clock');
   const tick = ()=>{
-    const e = document.getElementById('clock'); if(!e){ stopTimer(); return; }
+    const e = el(); if(!e){ stopTimer(); return; }
     const m = Math.floor(S.tLeft/60), s = S.tLeft%60;
     e.textContent = m+':'+String(s).padStart(2,'0');
-    if(S.tLeft<=0){ e.textContent='時間到 ✓'; e.style.color='var(--alert)'; say('Time is up. Please check the student.','en-US'); stopTimer(); return; }
+    if(S.tLeft<=0){ e.textContent='時間到 ✓'; e.style.color='#B33327'; stopTimer(); return; }
     S.tLeft--;
   };
-  tick(); S.timer=setInterval(tick,1000);
+  tick(); S.timer = setInterval(tick,1000);
 }
 function stopTimer(){ if(S.timer){ clearInterval(S.timer); S.timer=null; } }
 
 /* ---------- 紀錄 ---------- */
 function getRecs(){ try{ return JSON.parse(localStorage.getItem('ho_recs')||'[]'); }catch(e){ return window._recs||[]; } }
-function putRecs(r){ window._recs=r; try{ localStorage.setItem('ho_recs', JSON.stringify(r)); }catch(e){} }
+function putRecs(r){ window._recs = r; try{ localStorage.setItem('ho_recs', JSON.stringify(r)); }catch(e){} }
+
 function saveRec(){
-  const d = digest();
-  const r = {t:new Date().toISOString(), name:V('sName'), grade:V('sGrade'), age:S.age,
-    cat:S.cat.zh, catEn:S.cat.en, detail:d.zh.join('｜'), detailEn:d.en.join(' / '), flags:d.flags.join('；'),
-    temp:V('vTemp'), hr:V('vHr'), bp:V('vBp'), spo:V('vSpo'), pain:V('vPain'), note:V('vNote')};
-  const a = getRecs(); a.unshift(r); putRecs(a); go('log');
+  const d = digest(), v = id => (document.getElementById(id)||{value:''}).value.trim();
+  const r = {
+    t: new Date().toISOString(),
+    name: document.getElementById('sName').value.trim(),
+    grade: document.getElementById('sGrade').value.trim(),
+    cat: S.cat.zh, catEn: S.cat.en,
+    detail: d.zh.join('｜'), detailEn: d.en.join(' / '),
+    flags: d.flags.join('；'),
+    temp: v('vTemp'), hr: v('vHr'), bp: v('vBp'), pain: v('vPain'), note: v('vNote')
+  };
+  const all = getRecs(); all.unshift(r); putRecs(all);
+  go('log');
 }
-function delRec(i){ const a=getRecs(); a.splice(i,1); putRecs(a); drawLog(); }
+function delRec(i){ const a = getRecs(); a.splice(i,1); putRecs(a); drawLog(); }
+
 function drawLog(){
   const recs = getRecs();
   app.innerHTML = `
-    <h1 class="h1">Visit log</h1>
-    <p class="sub">就診紀錄存在這台 iPad 的瀏覽器中，建議每天下班前匯出 CSV 交給學校後清除。</p>
+    <h1 class="ask">Visit log</h1>
+    <p class="ask-zh">今日就診紀錄 — 存在這台 iPad 的瀏覽器中，可匯出 CSV 交給學校存檔。</p>
     <div class="nav noprint" style="margin-top:0">
       <button class="btn go" onclick="go('home')">← 回主畫面</button>
-      <button class="btn" onclick="exportCSV()">⬇︎ 匯出 CSV</button>
-      <button class="btn" onclick="window.print()">🖨 列印</button>
-      <span class="sp"></span>
-      <button class="btn" onclick="if(confirm('確定清除全部紀錄？此動作無法復原。')){putRecs([]);drawLog()}">清除全部</button>
+      <button class="btn" onclick="exportCSV()">匯出 CSV</button>
+      <button class="btn" onclick="window.print()">列印</button>
+      <span class="spacer"></span>
+      <button class="btn" onclick="if(confirm('確定清除全部紀錄？')){putRecs([]);drawLog()}">清除全部</button>
     </div>
     <div class="card">
-      ${recs.length?`<table class="log">
+      ${recs.length ? `<table class="log">
         <tr><th>時間</th><th>學生</th><th>主訴</th><th>細節</th><th>紅旗</th><th>生命徵象</th><th>處置備註</th><th></th></tr>
         ${recs.map((r,i)=>`<tr>
           <td>${new Date(r.t).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
-          <td>${esc(r.name||'—')}<br><span style="color:var(--ink3)">${esc(r.grade||'')}</span></td>
+          <td>${esc(r.name||'—')}<br><span style="color:#6E8A86">${esc(r.grade||'')}</span></td>
           <td>${esc(r.cat)}</td>
-          <td style="max-width:240px">${esc(r.detail)}</td>
-          <td style="color:var(--alert);max-width:200px">${esc(r.flags||'')}</td>
-          <td>${[r.temp&&'T '+r.temp,r.hr&&'HR '+r.hr,r.bp&&'BP '+r.bp,r.spo&&'SpO₂ '+r.spo,r.pain&&'Pain '+r.pain].filter(Boolean).map(esc).join('<br>')||'—'}</td>
-          <td style="max-width:240px">${esc(r.note||'')}</td>
-          <td class="noprint"><button class="sm" onclick="delRec(${i})">刪</button></td>
+          <td style="max-width:250px">${esc(r.detail)}</td>
+          <td style="color:#B33327">${esc(r.flags||'')}</td>
+          <td>${[r.temp&&'T '+r.temp, r.hr&&'HR '+r.hr, r.bp&&'BP '+r.bp, r.pain&&'Pain '+r.pain].filter(Boolean).map(esc).join('<br>')||'—'}</td>
+          <td style="max-width:250px">${esc(r.note||'')}</td>
+          <td class="noprint"><button class="small" onclick="delRec(${i})">刪</button></td>
         </tr>`).join('')}
-      </table>`:`<div class="empty">還沒有紀錄。學生完成點選後按「儲存就診紀錄」即會出現在這裡。</div>`}
+      </table>` : `<div class="empty">還沒有紀錄。學生完成點選後按「儲存這筆就診紀錄」即會出現在這裡。</div>`}
     </div>`;
 }
+
 function exportCSV(){
   const recs = getRecs();
   if(!recs.length){ alert('目前沒有紀錄可匯出。'); return; }
-  const head = ['時間','姓名','年級','年齡層','主訴','主訴EN','細節','細節EN','紅旗','體溫','脈搏','血壓','血氧','疼痛','處置備註'];
-  const rows = recs.map(r=>[new Date(r.t).toLocaleString('zh-TW'),r.name,r.grade,r.age,r.cat,r.catEn,r.detail,r.detailEn,r.flags,r.temp,r.hr,r.bp,r.spo,r.pain,r.note]);
-  const csv = '\uFEFF'+[head,...rows].map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const head = ['時間','姓名','年級班級','主訴','主訴(EN)','細節','細節(EN)','紅旗','體溫','脈搏','血壓','疼痛','處置備註'];
+  const rows = recs.map(r=>[new Date(r.t).toLocaleString('zh-TW'),r.name,r.grade,r.cat,r.catEn,r.detail,r.detailEn,r.flags,r.temp,r.hr,r.bp,r.pain,r.note]);
+  const csv = '\uFEFF' + [head,...rows].map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download = 'health-office-log-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download = 'health-office-log-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
 }
 
 function drawPhrases(){
   app.innerHTML = `
-    <h1 class="h1">English quick card</h1>
-    <p class="sub">常用英文對話，按 🔊 可以聽發音，也可以直接把 iPad 轉給學生看。</p>
+    <h1 class="ask">English quick card</h1>
+    <p class="ask-zh">常用英文對話 — 可以直接把 iPad 轉給學生看。</p>
     <div class="nav noprint" style="margin-top:0"><button class="btn go" onclick="go('home')">← 回主畫面</button></div>
-    <div class="grid w">
-      ${PHRASES.map(p=>`<div class="say" style="margin:0">
-        <div class="t"><div class="e">${esc(p[0])}</div><div class="c">${esc(p[1])}</div></div>
-        <button class="spk noprint" onclick="say('${q2(p[0])}','en-US')">🔊</button></div>`).join('')}
+    <div class="grid wide">
+      ${PHRASES.map(p=>`<div class="say" style="margin:0"><div class="e">${esc(p[0])}</div><div class="c">${esc(p[1])}</div></div>`).join('')}
     </div>`;
 }
 
 function drawSOS(){
-  const L = [
-    ['You — call 911 now and bring the AED.','你，現在打 911，並把 AED 拿過來。'],
-    ['Call the front office and bring the emergency card.','通知辦公室，把緊急聯絡卡帶來。'],
-    ['Everyone else, go back to class please.','其他同學請回教室。']
-  ];
   app.innerHTML = `
     <div class="sos">
       <h2>Emergency — 立即行動</h2>
-      <p style="margin:0 0 16px;font-size:17px">以下情況不要使用點選流程，直接處理：無反應、無呼吸、抽搐、大量出血、全身性過敏反應、無法說話的氣喘、意識改變、疑似脊椎損傷。</p>
+      <p style="margin:0 0 14px;font-size:17px">遇到以下情況不要使用點選流程，直接處理：無反應、無呼吸、抽搐、嚴重出血、全身性過敏反應、無法說話的氣喘發作、疑似脊椎損傷。</p>
       <ol>
-        <li>大聲求援並<strong>指名一位成人</strong>撥打 <strong>911</strong>（在台美國學校請同時依校規撥 119），不要對著空氣喊。</li>
-        <li>檢查反應與呼吸；無呼吸立即 CPR（30:2，速率 100–120／分，深度約 5 公分）並儘快接上 AED。</li>
-        <li>過敏性休克：依 allergy action plan 於<strong>大腿外側</strong>肌肉注射 epinephrine，記錄時間，學生平躺抬腿，即使緩解仍須送醫。</li>
-        <li>嚴重出血：直接加壓不放開，無效時使用止血帶並記錄開始時間。</li>
-        <li>抽搐：移開周圍硬物、側躺、不放任何東西入口、計時；超過 5 分鐘為 status epilepticus，立即 911。</li>
+        <li>大聲求援，請旁人到辦公室通知並撥打 <strong>911</strong>（在台美國學校請依校方規定同時撥 119）。</li>
+        <li>指定一位成人：「You — call 911 and bring the AED.」不要泛泛喊叫。</li>
+        <li>檢查反應與呼吸；無呼吸立即 CPR（成人 30:2，速率 100–120／分）並儘快使用 AED。</li>
+        <li>過敏性休克：依 allergy action plan 給 epinephrine 於大腿外側肌肉，記錄時間，學生保持平躺抬腿。</li>
+        <li>嚴重出血：直接加壓不放開，必要時加壓止血帶，記錄開始時間。</li>
+        <li>抽搐：移開周圍硬物、側躺、勿放任何東西入口、計時；超過 5 分鐘即為 status epilepticus。</li>
         <li>疑似頸椎損傷：不要移動學生，手動穩定頭頸部等待救護。</li>
-        <li>低血糖且意識不清：不可由口給任何東西，依 plan 給 glucagon 並 911。</li>
-        <li>指派一人通知家長與行政主管，一人到校門口引導救護車，並準備學生的 emergency card 與用藥紀錄。</li>
+        <li>指派一人通知家長與行政主管，一人在校門口引導救護車，並帶上學生的 emergency card。</li>
       </ol>
-      <div style="margin-top:16px">
-        ${L.map(l=>`<div class="say" style="background:#fff"><div class="t"><div class="e">${esc(l[0])}</div><div class="c">${esc(l[1])}</div></div>
-          <button class="spk noprint" onclick="say('${q2(l[0])}','en-US',0.95)">🔊</button></div>`).join('')}
-      </div>
+      <p style="margin:14px 0 0;font-size:16px"><strong>Say it：</strong>「Call 911 now. Bring the AED. Stay with me.」</p>
     </div>
-    <div class="nav noprint">
-      <button class="btn go" onclick="go('home')">← 回主畫面</button>
-      <button class="btn" onclick="go('call')">📞 家長電話腳本</button>
-    </div>`;
+    <div class="nav noprint"><button class="btn go" onclick="go('home')">← 回主畫面</button></div>`;
 }
 
-setAge('g35');
 draw();
 </script>
 </body>
