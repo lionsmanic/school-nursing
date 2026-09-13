@@ -157,6 +157,7 @@ table.log tr:last-child td{border-bottom:none}
     <input id="sName" placeholder="Student name 姓名" autocomplete="off">
     <input id="sGrade" placeholder="Grade / Class 年級班級" autocomplete="off" style="max-width:170px">
   </div>
+  <button class="barbtn noprint" style="background:#FBF0DB;border-color:#E7D2A4;color:#8A5709" onclick="go('meds')">💉 急救用藥</button>
   <button class="barbtn noprint" onclick="go('phrases')">英文速查</button>
   <button class="barbtn noprint" onclick="go('log')">紀錄</button>
   <button class="barbtn alarm noprint" onclick="go('sos')">EMERGENCY</button>
@@ -545,7 +546,7 @@ const PHRASES = [
 /* =========================================================
    狀態與流程
    ========================================================= */
-let S = {view:'home', cat:null, step:0, picks:[], sel:[], timer:null, tLeft:0};
+let S = {view:'home', cat:null, step:0, picks:[], sel:[], timer:null, tLeft:0, wt:0, med:'epi'};
 const app = document.getElementById('app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -588,6 +589,7 @@ function draw(){
   if(S.view==='result') return drawResult();
   if(S.view==='log') return drawLog();
   if(S.view==='phrases') return drawPhrases();
+  if(S.view==='meds') return drawMeds();
   if(S.view==='sos') return drawSOS();
 }
 
@@ -708,6 +710,7 @@ function drawResult(){
           <h3>下一步</h3>
           <div style="display:flex;flex-direction:column;gap:10px">
             <button class="btn go" onclick="saveRec()">儲存這筆就診紀錄</button>
+            <button class="btn" style="border-color:#E7D2A4;background:#FBF0DB" onclick="S.med=MEDMAP[S.cat.id]||'epi';go('meds')">💉 急救用藥劑量</button>
             <button class="btn" onclick="window.print()">列印／存成 PDF</button>
             <button class="btn" onclick="go('home')">回到主畫面 New student</button>
           </div>
@@ -821,7 +824,275 @@ function drawSOS(){
       </ol>
       <p style="margin:14px 0 0;font-size:16px"><strong>Say it：</strong>「Call 911 now. Bring the AED. Stay with me.」</p>
     </div>
-    <div class="nav noprint"><button class="btn go" onclick="go('home')">← 回主畫面</button></div>`;
+    <div class="nav noprint">
+      <button class="btn go" onclick="go('home')">← 回主畫面</button>
+      <button class="btn" style="border-color:#E7D2A4;background:#FBF0DB" onclick="S.med='epi';go('meds')">💉 急救用藥劑量</button>
+    </div>`;
+}
+
+/* =======================================================================
+   校園急救藥物快速對照（依體重自動換算）
+   所有給藥一律依該校 standing orders 與該生 action plan
+   ======================================================================= */
+const MEDMAP = {skin:'epi', breath:'alb', med:'glu', fever:'anti', head:'anti',
+                period:'anti', sprain:'anti', cut:'top', tooth:'anti'};
+
+function lb2kg(lb){ return lb*0.45359237; }
+function r1(n){ return Math.round(n*10)/10; }
+function r2(n){ return Math.round(n*100)/100; }
+function ml(mg, per, vol){ return r1(mg/per*vol); }
+
+const MEDS = [
+{ id:'epi', tab:'Epinephrine', name:'Epinephrine 腎上腺素', sub:'全身性過敏反應 ANAPHYLAXIS — 第一線且唯一救命藥', tone:'alert',
+  when:[
+    '兩個以上器官系統受累（皮膚＋呼吸／腸胃／循環）→ 立即給藥',
+    '已知過敏原暴露後出現任一呼吸道或循環症狀（喉嚨緊、喘鳴、聲音沙啞、呼吸困難、頭暈、血壓低）→ 立即給藥',
+    '只要懷疑就給，不要等症狀惡化；延遲給藥是過敏死亡最主要原因',
+    '抗組織胺與吸入劑都不能取代 epinephrine，也不可先給抗組織胺觀察'
+  ],
+  dose:function(kg){
+    const rows = [
+      ['自動注射筆 Auto-injector', kg?(kg<15?'0.1 mg（7.5–15 kg 裝置，如 Auvi-Q）':kg<30?'0.15 mg（EpiPen Jr）':'0.3 mg（EpiPen）'):'15–30 kg → 0.15 mg｜≥ 30 kg → 0.3 mg'],
+      ['安瓿／小瓶 1 mg/mL (1:1000) IM', kg?(r2(Math.min(kg*0.01, kg<40?0.3:0.5))+' mg ＝ '+r2(Math.min(kg*0.01, kg<40?0.3:0.5))+' mL（1 mg/mL）'):'0.01 mg/kg，單次上限 0.3 mg（兒童）／0.5 mg（青少年）'],
+      ['鼻噴劑 neffy（若學校備有）', kg?(kg<15?'不適用，改用注射':kg<30?'1 mg 單側鼻孔':'2 mg 單側鼻孔'):'15–30 kg → 1 mg｜≥ 30 kg → 2 mg']
+    ];
+    return rows;
+  },
+  how:[
+    '注射部位：<strong>大腿中段外側（vastus lateralis）</strong>，可隔著衣物直接打，勿打臀部或手臂',
+    '握筆時<strong>拇指不可蓋住兩端</strong>，避免誤射入自己手指；注射後停留約 3 秒（Auvi-Q 約 2 秒）',
+    '注射後不需按摩注射處；記錄注射時間與部位',
+    '學生<strong>平躺、雙腿抬高</strong>；有嘔吐則側臥；呼吸困難可半坐臥。<strong>絕不可讓學生站起來或走動</strong>',
+    '用過的針具回套保護蓋，整支交給救護人員'
+  ],
+  repeat:'若 5–15 分鐘後症狀未改善或再度惡化 → <strong>可再給第二劑</strong>（換另一側大腿）。學校通常僅備一劑，故務必同時已叫救護車。',
+  after:[
+    '<strong>一律撥打 911（在台請依校規同時撥 119）</strong>，即使症狀完全緩解也必須送醫',
+    '雙相反應：約 5–20% 會在 1–72 小時後再次發作，因此不得讓家長直接接回家不就醫',
+    '持續監測呼吸、脈搏、血壓、意識，每 5 分鐘一次並記錄',
+    '有氣喘者可在 epinephrine 之後追加 rescue inhaler，但順序不可顛倒',
+    '通知家長與行政主管，填寫過敏事件報告，並補充學校備藥'
+  ],
+  bad:['先給抗組織胺再觀察','給藥後讓學生自己走去保健室或廁所','症狀緩解就取消救護車','打在臀部或手臂','等家長同意才給藥（緊急狀況依 standing order 執行）']
+},
+
+{ id:'alb', tab:'Albuterol', name:'Albuterol 沙丁胺醇（rescue inhaler）', sub:'氣喘急性發作 ASTHMA — 短效支氣管擴張劑', tone:'teal',
+  when:[
+    '咳嗽、喘鳴、胸悶、呼吸困難、運動後呼吸不順',
+    '依該生 asthma action plan 的黃區／紅區指示使用',
+    '呼吸困難合併全身過敏症狀時 → <strong>先給 epinephrine</strong>，再給吸入劑'
+  ],
+  dose:function(kg){
+    return [
+      ['定量噴霧 MDI 90 mcg/puff（加 spacer）','一般發作 2–4 puffs；重度依 action plan 可至 4–8 puffs，每 puff 間隔約 1 分鐘'],
+      ['噴霧治療 Nebulizer','2.5 mg／3 mL 生理食鹽水（體重 < 20 kg 可用 1.25–2.5 mg），約 10 分鐘吸完'],
+      ['重複間隔','每 20 分鐘可重複，最多 3 次（共 1 小時內）']
+    ];
+  },
+  how:[
+    '<strong>一定要用 spacer（chamber）</strong>，兒童直接對嘴噴藥效率極低',
+    '坐直（tripod position），搖勻噴霧器，慢吸後<strong>閉氣 10 秒</strong>，每 puff 間隔約 1 分鐘',
+    '只能使用<strong>該生本人</strong>且有授權文件的吸入劑；學校若有 stock albuterol 需依州法與醫囑使用',
+    '給藥後測量呼吸速率、能否說完整句子、有無使用呼吸輔助肌、嘴唇顏色，可用血氧機'
+  ],
+  repeat:'每 20 分鐘一次、最多 3 次。<strong>第一次給藥後 15–20 分鐘未明顯改善，或需要第三次，即應撥 911。</strong>',
+  after:[
+    '緩解者留觀 20 分鐘，通知家長，當日避免劇烈運動',
+    '常見副作用：心跳加快、手抖、躁動，屬預期反應，不需停藥',
+    '記錄給藥時間、劑量、給藥前後呼吸狀況'
+  ],
+  bad:['只能講單字或無法說話仍在等吸入劑生效（此時直接 911）','平躺','未使用 spacer','使用他人吸入劑']
+},
+
+{ id:'glu', tab:'低血糖', name:'低血糖處置 Hypoglycemia', sub:'口服糖 15 g 法則 ／ Glucagon', tone:'amber',
+  when:[
+    '血糖 < 70 mg/dL，或出現發抖、冒冷汗、心悸、飢餓、臉色蒼白、注意力渙散、行為改變',
+    '<strong>意識清楚且能吞嚥</strong> → 口服快速糖',
+    '<strong>意識不清、抽搐、無法吞嚥</strong> → 立即 glucagon，絕不可由口給任何東西',
+    '懷疑低血糖但無法測血糖時，一律當作低血糖處理'
+  ],
+  dose:function(kg){
+    const g = kg && kg<25 ? '0.5 mg' : (kg ? '1 mg' : '< 25 kg → 0.5 mg｜≥ 25 kg → 1 mg');
+    return [
+      ['口服快速糖（清醒時）','15 g：果汁 120 ml、含糖汽水 120 ml、葡萄糖片 3–4 片或葡萄糖凝膠 1 條（幼童可用 10 g）'],
+      ['Glucagon 注射 IM／SC（昏迷時）', g + (kg?'（依體重）':'') + '，注射於大腿外側或上臂'],
+      ['Gvoke 預充式筆','2–< 45 kg → 0.5 mg｜≥ 45 kg → 1 mg'],
+      ['Baqsimi 鼻噴劑','3 mg 單側鼻孔，4 歲以上不需依體重調整，即使鼻塞仍有效']
+    ];
+  },
+  how:[
+    '<strong>15 法則：</strong>給 15 g 快速糖 → 等 15 分鐘 → 重測血糖。仍 < 70 mg/dL 就再給一次 15 g',
+    '血糖回升後，若距下一餐超過 1 小時，追加含蛋白質與複合醣的點心（如起司餅乾）',
+    '昏迷者：側臥擺位、保護呼吸道，給 glucagon 後<strong>立即撥 911</strong>',
+    '低血糖學生<strong>絕不可單獨移動</strong>，不可讓他自己走來保健室，護理師應前往現場'
+  ],
+  repeat:'口服糖每 15 分鐘可重複；glucagon 若 15 分鐘未清醒可再給一劑（若有第二支）並持續 911 支援。',
+  after:[
+    'Glucagon 後常見嘔吐 → 保持側臥防吸入',
+    '任何使用 glucagon 的事件一律送醫並通知家長',
+    '記錄血糖數值、時間、給糖內容與複測結果；通報家長當日血糖紀錄'
+  ],
+  bad:['對意識不清的學生灌食物、果汁或塗糖在牙齦','用低糖／代糖飲料或巧克力（脂肪延緩吸收）','沒有複測血糖就讓學生回教室','讓學生自己走去保健室']
+},
+
+{ id:'anti', tab:'退燒止痛', name:'Acetaminophen ／ Ibuprofen ／ Diphenhydramine', sub:'非緊急用藥 — 必須有家長書面同意與 standing order', tone:'amber',
+  when:[
+    '<strong>這三種藥在美國學校都屬於「需家長書面同意＋醫囑」才能給的藥</strong>，沒有文件一律不給',
+    '發燒 ≥ 100.4°F（38°C）多數學校規定是通知家長帶回，而不是給退燒藥後讓學生留校',
+    'Diphenhydramine 僅用於<strong>輕微局部</strong>過敏反應，且<strong>絕不可取代 epinephrine</strong>'
+  ],
+  dose:function(kg){
+    const A = kg? r1(Math.min(kg*15,1000)) : null;
+    const I = kg? r1(Math.min(kg*10,400)) : null;
+    const D = kg? r1(Math.min(kg*1,50)) : null;
+    return [
+      ['Acetaminophen（Tylenol）', kg? A+' mg（15 mg/kg，每 4–6 小時，單次上限 1000 mg）＝ 糖漿 160 mg/5 mL 約 '+ml(A,160,5)+' mL' : '15 mg/kg，每 4–6 小時，單次上限 1000 mg'],
+      ['Ibuprofen（Advil／Motrin）', kg? I+' mg（10 mg/kg，每 6–8 小時，單次上限 400 mg）＝ 懸液 100 mg/5 mL 約 '+ml(I,100,5)+' mL｜需隨餐或餐後' : '10 mg/kg，每 6–8 小時，單次上限 400 mg；6 個月以下不用'],
+      ['Diphenhydramine（Benadryl）', kg? D+' mg（1 mg/kg，每 6 小時，單次上限 50 mg）＝ 糖漿 12.5 mg/5 mL 約 '+ml(D,12.5,5)+' mL' : '1 mg/kg，每 6 小時，單次上限 50 mg'],
+      ['⚠ 不可給兒童 Aspirin','病毒感染兒童使用可能引發 Reye syndrome，學校一律不給']
+    ];
+  },
+  how:[
+    '給藥前執行<strong>五對</strong>：對人、對藥、對劑量、對時間、對途徑，並核對家長同意書效期',
+    '確認學生今日在家是否已服藥、服藥時間與劑量，避免重複劑量',
+    '給藥後記錄於 MAR 並簽名，通知家長已給藥',
+    'Ibuprofen 需飯後或隨食物；腹痛未排除急腹症前不給任何止痛藥'
+  ],
+  repeat:'依上述間隔；學校時段內原則上只給一劑，需第二劑代表病情未緩解，應通知家長帶回。',
+  after:['給藥後 30–60 分鐘重新評估症狀與體溫','未緩解或反覆發燒 → 通知家長帶回就醫'],
+  bad:['沒有家長同意書就給藥','用學校備藥給有藥物過敏史未查證的學生','給退燒藥後讓發燒學生留在教室（掩蓋症狀且持續傳染）','以 Benadryl 處理全身性過敏反應']
+},
+
+{ id:'top', tab:'外用與其他', name:'外用藥與一般備品', sub:'傷口、蟲咬、曬傷等日常處置', tone:'teal',
+  when:['擦傷、割傷、蟲咬、輕微曬傷等不需全身性用藥的情況'],
+  dose:function(kg){
+    return [
+      ['抗菌藥膏 Bacitracin／Neosporin','清潔止血後薄擦一層再覆蓋敷料；已知新黴素過敏者勿用'],
+      ['1% Hydrocortisone 乳膏','蟲咬或接觸性皮膚炎，每日 1–2 次薄擦；勿用於臉部、破皮或滲液傷口'],
+      ['生理食鹽水','沖洗傷口與眼睛（眼睛連續沖 15 分鐘）'],
+      ['蘆薈膠 Aloe','輕度曬傷，冷敷後薄擦；水泡不可弄破'],
+      ['冰敷袋','每次 15 分鐘，中間隔一層毛巾，勿直接接觸皮膚'],
+      ['口服補水','中暑或脫水：每 15 分鐘 120–240 ml 含電解質飲料'],
+      ['⚠ 不可使用','催吐劑 Ipecac、活性碳（未經毒物中心指示）、酒精或雙氧水沖洗傷口、他人處方藥']
+    ];
+  },
+  how:['所有外用藥仍屬「給藥」行為，需依校規確認是否需家長同意','使用前確認過敏史，使用後記錄於就診紀錄'],
+  repeat:'依包裝指示，學校時段內通常只處理一次。',
+  after:['告知學生與家長後續照護方式','傷口惡化、紅腫熱痛或化膿 → 通知家長就醫'],
+  bad:['用雙氧水或酒精直接沖洗開放傷口（延遲癒合）','把類固醇乳膏塗在疑似感染或破皮處','未經毒物中心指示自行催吐']
+},
+
+{ id:'nal', tab:'Naloxone', name:'Naloxone 鼻噴劑（Narcan）', sub:'疑似鴉片類藥物過量 — 部分學校列為常備', tone:'alert',
+  when:[
+    '意識不清無法叫醒、呼吸極慢或停止、嘴唇發紫、瞳孔極度縮小',
+    '<strong>不確定原因的昏迷也可以給</strong> — 若非鴉片類中毒，naloxone 不會造成傷害',
+    '先確認學校是否備有並已納入 standing orders'
+  ],
+  dose:function(kg){
+    return [
+      ['鼻噴劑 4 mg','單側鼻孔全量噴入一次，不需依體重調整'],
+      ['重複給藥','每 2–3 分鐘可再給一劑，交替鼻孔，直到呼吸恢復或救護人員到達'],
+      ['注射劑 0.4 mg/mL IM','若學校備的是注射劑，依醫囑與 standing order 執行']
+    ];
+  },
+  how:['先撥 911，再給藥','讓學生仰臥、托下巴打開呼吸道，噴完後改側臥（recovery position）','無呼吸或僅有瀕死式喘息 → 立即開始 CPR，勿只等 naloxone 生效'],
+  repeat:'每 2–3 分鐘一劑，交替鼻孔，持續到有反應或 EMS 接手。',
+  after:['作用時間比多數鴉片類短 → 可能再度昏迷，<strong>一律送醫並全程陪同</strong>','記錄給藥時間與劑數，交給救護人員','通知行政主管與家長，依校規處理'],
+  bad:['給藥後就認為安全而取消救護車','讓學生獨處','等家長同意才給藥']
+}
+];
+
+function doseRows(m, kg){
+  return m.dose(kg).map(r=>`<tr>
+    <td style="padding:11px 10px;border-bottom:1px solid var(--line);font-weight:600;width:34%;vertical-align:top;font-size:16px">${r[0]}</td>
+    <td style="padding:11px 10px;border-bottom:1px solid var(--line);font-size:17px;${kg?'font-weight:600':''}">${r[1]}</td></tr>`).join('');
+}
+function wtEchoText(kg){
+  return kg ? ('＝ '+kg+' kg ／ '+Math.round(kg/0.45359237)+' lb') : '未輸入體重時顯示標準體重區間';
+}
+/* 只更新劑量表，不重繪整頁，避免輸入時鍵盤焦點跳掉 */
+function updateDose(){
+  const kg = S.wt || 0;
+  const m = MEDS.find(x=>x.id===(S.med||'epi')) || MEDS[0];
+  const b = document.getElementById('doseBody'); if(b) b.innerHTML = doseRows(m, kg);
+  const h = document.getElementById('doseHdr'); if(h) h.textContent = kg ? '（已依 '+kg+' kg 換算）' : '';
+  const e = document.getElementById('wtEcho');  if(e) e.textContent = wtEchoText(kg);
+}
+
+function drawMeds(){
+  const kg = S.wt || 0;
+  const m = MEDS.find(x=>x.id===(S.med||'epi')) || MEDS[0];
+  const tone = m.tone==='alert' ? 'var(--alert)' : m.tone==='amber' ? 'var(--amber)' : 'var(--teal)';
+  const bg   = m.tone==='alert' ? 'var(--alert-dim)' : m.tone==='amber' ? 'var(--amber-dim)' : 'var(--teal-dim)';
+  app.innerHTML = `
+    <h1 class="ask">Emergency medications</h1>
+    <p class="ask-zh">校園急救藥物劑量快速對照 — 輸入體重可自動換算。</p>
+
+    <div class="card noprint" style="padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:15px;color:var(--ink-2);font-weight:600">學生體重</label>
+        <input id="wKg" inputmode="decimal" placeholder="kg" value="${kg?kg:''}" style="width:110px;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#FBFDFC"
+          oninput="S.wt=parseFloat(this.value)||0;document.getElementById('wLb').value='';updateDose()">
+        <span style="color:var(--ink-2)">或</span>
+        <input id="wLb" inputmode="decimal" placeholder="lb 磅" style="width:110px;font:inherit;font-size:17px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#FBFDFC"
+          oninput="S.wt=Math.round(lb2kg(parseFloat(this.value)||0)*10)/10;document.getElementById('wKg').value=S.wt||'';updateDose()">
+        <span id="wtEcho" style="font-size:16px;font-weight:600">${wtEchoText(kg)}</span>
+        <span class="spacer"></span>
+        <button class="small" onclick="S.wt=0;drawMeds()">清除</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${MEDS.map(x=>`<button class="btn" style="padding:11px 16px;font-size:16px;${x.id===m.id?'background:var(--ink);border-color:var(--ink);color:#fff':''}"
+        onclick="S.med='${x.id}';drawMeds()">${esc(x.tab)}</button>`).join('')}
+    </div>
+
+    <div class="card" style="border-color:${tone};border-width:2px">
+      <div style="background:${bg};margin:-20px -20px 18px;padding:16px 20px;border-radius:10px 10px 0 0">
+        <div style="font-size:24px;font-weight:700;color:${tone};letter-spacing:-.01em">${esc(m.name)}</div>
+        <div style="font-size:16px;color:var(--ink-2);margin-top:4px">${esc(m.sub)}</div>
+      </div>
+
+      <h3>什麼時候給 INDICATIONS</h3>
+      <ul style="margin:0 0 18px;padding-left:20px">${m.when.map(x=>`<li style="font-size:17px;margin-bottom:8px;line-height:1.55">${x}</li>`).join('')}</ul>
+
+      <h3>劑量 DOSE<span id="doseHdr">${kg?'（已依 '+kg+' kg 換算）':''}</span></h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:18px">
+        <tbody id="doseBody">${doseRows(m,kg)}</tbody>
+      </table>
+
+      <h3>怎麼給 ADMINISTRATION</h3>
+      <ol class="steps" style="margin-bottom:18px">${m.how.map(x=>`<li>${x}</li>`).join('')}</ol>
+
+      <div class="dispo" style="margin-bottom:18px"><b>可否重複：</b>${m.repeat}</div>
+
+      <h3>給藥之後一定要做 AFTER</h3>
+      <ol class="steps" style="margin-bottom:18px">${m.after.map(x=>`<li>${x}</li>`).join('')}</ol>
+
+      <div class="flagbox" style="margin:0">
+        <h4>常見錯誤 DO NOT</h4>
+        <ul>${m.bad.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    <div class="card" style="background:#FBFDFC">
+      <h3>給藥前後的共同原則</h3>
+      <ol class="steps">
+        <li><strong>先查文件：</strong>該生的 action plan、medication authorization form、家長同意書與過敏史；緊急狀況依 standing orders 執行，不需等家長同意。</li>
+        <li><strong>五對：</strong>對人、對藥、對劑量、對時間、對途徑；核對藥品姓名標籤與有效期限。</li>
+        <li><strong>記錄：</strong>給藥時間、劑量、部位、給藥前後的生命徵象與反應，簽名於 MAR 與就診紀錄。</li>
+        <li><strong>中毒諮詢：</strong>美國 Poison Control <strong>1-800-222-1222</strong>（24 小時，可指示是否催吐或送醫）。</li>
+        <li><strong>本頁僅為快速對照</strong>，實際劑量以該校醫囑、standing orders 與藥品說明書為準；上任第一天請先索取校方急救藥物清單與存放位置。</li>
+      </ol>
+    </div>
+
+    <div class="nav noprint">
+      <button class="btn go" onclick="go('home')">← 回主畫面</button>
+      <button class="btn" onclick="go('sos')">🚨 緊急流程</button>
+      <button class="btn" onclick="window.print()">列印這一頁</button>
+    </div>`;
+  const f = document.getElementById('wKg');
+  if(f && kg){ f.value = kg; }
 }
 
 draw();
