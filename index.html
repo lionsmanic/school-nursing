@@ -202,6 +202,8 @@ const DATA = [
       {en:'My vision is blurry', zh:'視線模糊', flag:'視力改變 — 需通知家長，不宜自行返家'},
       {en:'No breakfast today', zh:'今天沒吃早餐', act:['低血糖可能：給予餅乾或果汁，15 分鐘後重新評估']},
       {en:'I didn\'t sleep well', zh:'昨晚沒睡好'},
+      {en:'I was outside in the sun or at PE', zh:'剛剛在太陽下或上體育課',
+        act:['評估熱傷害：移至陰涼處、脫除護具、補充含電解質飲料，並參考中暑處置頁']},
       {en:'Nothing else', zh:'沒有了'}
     ]}
   ],
@@ -318,6 +320,8 @@ const DATA = [
       {en:'Hard to breathe', zh:'呼吸困難', flag:'呼吸困難 — 立即評估呼吸速率與血氧，必要時啟動 EMS'},
       {en:'Rash on my skin', zh:'身上有紅疹', flag:'發燒合併皮疹 — 需隔離並通知家長就醫排除傳染病'},
       {en:'Someone at home is sick', zh:'家裡有人生病'},
+      {en:'I was outside in the heat', zh:'剛剛在大太陽下',
+        flag:'高溫暴露後體溫升高 — 需區分感染性發燒與熱傷害；若有意識改變一律以熱中暑處理並撥 911'},
       {en:'I threw up', zh:'有嘔吐'},
       {en:'Nothing else', zh:'沒有了'}
     ]}
@@ -500,6 +504,65 @@ const DATA = [
        {en:'Stay here with me. Do not walk back alone.', zh:'留在這裡，不要自己走回去。'}]
 },
 
+{ id:'heat', en:'Too hot / Dizzy after PE / Sunburn', zh:'中暑、熱衰竭、曬傷', ico:'☀️',
+  q:[
+    {en:'What is wrong?', zh:'怎麼了？可複選', multi:true, o:[
+      {en:'I feel very hot and tired', zh:'很熱、全身無力'},
+      {en:'I feel dizzy or faint', zh:'頭暈、快昏倒'},
+      {en:'I have a headache', zh:'頭痛'},
+      {en:'I feel like throwing up', zh:'噁心想吐'},
+      {en:'My muscles are cramping', zh:'肌肉抽筋',
+        act:['熱痙攣：伸展並輕柔按摩該肌群，補充含鈉運動飲料與鹹餅乾','熱痙攣可能是熱衰竭前兆，補水後仍需留觀 30 分鐘']},
+      {en:'My skin is red and burning from the sun', zh:'皮膚曬紅發燙',
+        act:['冷水濕敷曬傷處 15 分鐘，可塗蘆薈；水泡不可弄破','不可塗凡士林、奶油或含 benzocaine 的噴劑','大面積水泡、發燒或臉部嚴重曬傷 → 通知家長就醫']},
+      {en:'I stopped sweating', zh:'流不出汗了'}
+    ]},
+    {en:'Very important — any of these?', zh:'非常重要 — 有沒有以下情況？', multi:true, o:[
+      {en:'I feel confused or cannot think clearly', zh:'意識模糊、講不清楚',
+        flag:'⚠ 意識或行為改變 ＋ 高溫暴露 ＝ 視同 HEAT STROKE：立即撥 911 並「先降溫再後送」',
+        act:['立即全身積極降溫，不要等救護車再開始（cool first, transport second）','側臥保護呼吸道，意識不清者「不可由口給任何液體」']},
+      {en:'I fell down or passed out', zh:'跌倒或昏倒過',
+        flag:'⚠ 熱暴露後昏厥 — 必須送醫；同時檢查有無跌倒造成的頭部外傷'},
+      {en:'I threw up', zh:'已經吐了',
+        flag:'嘔吐 — 無法口服補水，需通知家長送醫並考慮靜脈輸液'},
+      {en:'My skin is hot and dry', zh:'皮膚燙而乾'},
+      {en:'Just hot and tired, I can think clearly', zh:'只是熱和累，意識清楚'}
+    ]},
+    {en:'Where were you?', zh:'剛剛在哪裡？', multi:true, o:[
+      {en:'PE class or sports practice', zh:'體育課或球隊練習',
+        act:['立即脫除護具、頭盔與多餘衣物，這是降溫最快的第一步']},
+      {en:'Outside at recess', zh:'下課在外面玩'},
+      {en:'Marching band or outdoor event', zh:'樂隊或戶外活動'},
+      {en:'Walking to school', zh:'走路上學'},
+      {en:'Inside, but the room was very hot', zh:'在室內但很熱'}
+    ]},
+    {en:'Did you drink water today?', zh:'今天有喝水嗎？', multi:false, o:[
+      {en:'Yes, a lot', zh:'有，喝很多'},
+      {en:'A little', zh:'喝一點點'},
+      {en:'Almost nothing', zh:'幾乎沒喝', act:['脫水明顯：依補水方案給予含電解質飲料，並通知家長']},
+      {en:'I was fasting / did not eat', zh:'今天沒吃沒喝',
+        flag:'合併未進食 — 同時評估低血糖，必要時測血糖'}
+    ]},
+    {en:'Have you been sick or had a fever recently?', zh:'最近有生病或發燒嗎？', multi:false, o:[
+      {en:'No', zh:'沒有'},
+      {en:'Yes, in the last few days', zh:'有，這幾天',
+        flag:'近期發燒或腹瀉 — 脫水風險高，且需與感染性發燒鑑別'},
+      {en:'I take medicine every day', zh:'我每天有吃藥',
+        act:['查閱該生用藥：抗組織胺、利尿劑、ADHD 興奮劑等會增加熱傷害風險']}
+    ]}
+  ],
+  plan:['立即移至冷氣房或陰涼處，「脫除護具與多餘衣物」，平躺並抬高下肢',
+        '評估「意識狀態」（最關鍵指標）、體溫、脈搏、呼吸、血壓並記錄；額溫或耳溫在運動後不準確，不可用來排除熱中暑',
+        '意識清楚可吞嚥：每 15–20 分鐘給 120–240 ml 冷開水或含電解質運動飲料，1 小時內分次喝完',
+        '主動降溫：頸部、腋下、鼠蹊部放冰袋，皮膚噴水或覆蓋冰濕毛巾（每 2–3 分鐘更換）並用電扇吹',
+        '每 10 分鐘重新評估一次；「30 分鐘內未明顯改善即通知家長送醫」',
+        '不可給退燒藥（acetaminophen／ibuprofen 對熱傷害無效且可能有害）'],
+  dispo:'意識清楚、補水後 30 分鐘內改善的熱衰竭 → 留觀後返班，當日不再參加戶外活動並通知家長。「出現任何意識改變、昏厥、嘔吐無法補水或皮膚燙而乾 → 立即 911，並在等待時持續積極降溫。」經歷熱中暑者返回運動需醫師書面許可。',
+  say:[{en:'Come inside where it is cool. Take off your jersey and pads.', zh:'進來涼快的地方，把球衣和護具脫掉。'},
+       {en:'Lie down. I will put ice packs on your neck.', zh:'躺下來，我在你脖子放冰袋。'},
+       {en:'Drink this slowly, a few sips every few minutes.', zh:'慢慢喝，每幾分鐘喝一小口。'},
+       {en:'What day is it? Where are you right now?', zh:'今天星期幾？你現在在哪裡？（測意識）'}]
+},
 { id:'rest', en:'I just need to rest / ice', zh:'只是想休息、冰敷', ico:'🧊',
   q:[
     {en:'What do you need?', zh:'需要什麼？', multi:false, o:[
@@ -819,6 +882,7 @@ function drawSOS(){
         <li>過敏性休克：依 allergy action plan 給 epinephrine 於大腿外側肌肉，記錄時間，學生保持平躺抬腿。</li>
         <li>嚴重出血：直接加壓不放開，必要時加壓止血帶，記錄開始時間。</li>
         <li>抽搐：移開周圍硬物、側躺、勿放任何東西入口、計時；超過 5 分鐘即為 status epilepticus。</li>
+        <li>疑似熱中暑（高溫暴露＋意識改變）：脫除所有裝備，<strong>先積極降溫再後送</strong>，冰水浸泡或冰濕毛巾全身包覆，不要等救護車才開始。</li>
         <li>疑似頸椎損傷：不要移動學生，手動穩定頭頸部等待救護。</li>
         <li>指派一人通知家長與行政主管，一人在校門口引導救護車，並帶上學生的 emergency card。</li>
       </ol>
@@ -834,7 +898,7 @@ function drawSOS(){
    校園急救藥物快速對照（依體重自動換算）
    所有給藥一律依該校 standing orders 與該生 action plan
    ======================================================================= */
-const MEDMAP = {skin:'epi', breath:'alb', med:'glu', fever:'anti', head:'anti',
+const MEDMAP = {skin:'epi', breath:'alb', med:'glu', heat:'cool', fever:'anti', head:'anti',
                 period:'anti', sprain:'anti', cut:'top', tooth:'anti'};
 
 function lb2kg(lb){ return lb*0.45359237; }
@@ -935,6 +999,45 @@ const MEDS = [
   bad:['對意識不清的學生灌食物、果汁或塗糖在牙齦','用低糖／代糖飲料或巧克力（脂肪延緩吸收）','沒有複測血糖就讓學生回教室','讓學生自己走去保健室']
 },
 
+{ id:'cool', tab:'中暑降溫', name:'熱傷害處置 Heat illness', sub:'熱衰竭 vs 熱中暑 — 判斷關鍵是意識狀態，不是有沒有流汗', tone:'amber',
+  when:[
+    '<strong>熱衰竭 Heat exhaustion：</strong>頭暈、噁心、頭痛、無力、抽筋、大量出汗，<strong>意識清楚</strong> → 降溫＋口服補水，30 分鐘內應改善',
+    '<strong>熱中暑 Heat stroke：</strong>高溫暴露 ＋ <strong>任何意識或行為改變</strong>（混亂、答非所問、暴躁、步態不穩、抽搐、昏迷）→ 立即 911',
+    '<strong>常見誤解：</strong>「皮膚燙而乾、停止流汗」是典型（非運動型）中暑的表現；<strong>運動型熱中暑的學生常常還在大量流汗</strong>，不可因為有流汗就排除熱中暑',
+    '運動後的額溫、耳溫、腋溫都不準確，<strong>體溫正常不能排除熱中暑</strong>，以症狀判斷',
+    '高風險：暑期集訓前兩週未適應熱環境、穿戴護具的球員、肥胖、近期發燒腹瀉、服用抗組織胺／利尿劑／ADHD 興奮劑者'
+  ],
+  dose:function(kg){
+    const v = kg ? Math.round(kg*10) : null;
+    return [
+      ['口服補水（意識清楚時）', kg ? ('每 15–20 分鐘 120–240 ml，1 小時內約 '+Math.min(Math.max(v,400),1000)+' ml（約 10 ml/kg/hr），冷開水或含電解質運動飲料')
+                                    : '每 15–20 分鐘 120–240 ml，1 小時內分次喝完；冷開水或含電解質運動飲料'],
+      ['熱痙攣加強補鈉','含鈉運動飲料，搭配鹹餅乾或鹽錠（依校規）；單喝白開水反而可能加重低血鈉'],
+      ['意識不清時','<strong>不可由口給任何液體</strong>，側臥保護呼吸道，等待救護車靜脈輸液'],
+      ['退燒藥','<strong>不可使用</strong> acetaminophen 或 ibuprofen — 對熱傷害無降溫效果，且在橫紋肌溶解或肝腎受損時有害'],
+      ['冰敷部位','頸部、腋下、鼠蹊部（大血管處）＋ 全身噴水／冰濕毛巾每 2–3 分鐘更換 ＋ 電扇'],
+      ['降溫目標','<strong>30 分鐘內降至 38.9°C（102°F）以下</strong>；學校無法測核心體溫時，以意識恢復與皮膚降溫為指標']
+    ];
+  },
+  how:[
+    '<strong>第一步永遠是脫裝備：</strong>頭盔、護具、球衣、鞋襪全部脫除，這比任何冰敷都快',
+    '移至冷氣房或陰涼處，平躺並抬高下肢',
+    '<strong>疑似熱中暑：cool first, transport second</strong> — 積極降溫不要等救護車，冷水浸泡（cold water immersion）是黃金標準',
+    '沒有浴缸時用 taco method：把學生放在防水布或帆布上，四周拉起後倒入冰水包覆軀幹；或以冰水浸濕的大浴巾覆蓋全身，每 2–3 分鐘換一次',
+    '持續監測意識、呼吸、脈搏；出現抽搐依癲癇處置，嘔吐立即側臥',
+    '學生開始發抖是正常降溫反應，不需因此停止降溫（但需與 EMS 交班說明）'
+  ],
+  repeat:'降溫持續進行直到意識恢復正常或 EMS 接手。口服補水每 15–20 分鐘一次，共約 1 小時後重新評估；<strong>30 分鐘內未改善即視為需要送醫。</strong>',
+  after:[
+    '任何熱中暑（有意識改變者）一律送醫，<strong>不可由家長直接接回家</strong>，可能合併橫紋肌溶解、急性腎損傷與電解質異常',
+    '熱衰竭學生當日不得再參加戶外活動或體育課，並通知家長返家後續觀察',
+    '<strong>經歷熱中暑者返回運動需醫師書面許可</strong>，並採漸進式熱適應',
+    '記錄事發時間、當時活動、環境溫濕度、意識狀態變化、降溫方式與補水量',
+    '通報體育組與行政主管，檢討當日活動是否符合熱指數規範'
+  ],
+  bad:['因為學生還在流汗就排除熱中暑','用額溫或耳溫「正常」來排除熱中暑','給退燒藥','對意識不清的學生灌水或運動飲料',
+       '先送上救護車才開始降溫（延誤降溫直接影響存活率）','讓學生自己走去保健室或自行沖冷水澡','熱中暑後當天或隔天就回去練球']
+},
 { id:'anti', tab:'退燒止痛', name:'Acetaminophen ／ Ibuprofen ／ Diphenhydramine', sub:'非緊急用藥 — 必須有家長書面同意與 standing order', tone:'amber',
   when:[
     '<strong>這三種藥在美國學校都屬於「需家長書面同意＋醫囑」才能給的藥</strong>，沒有文件一律不給',
